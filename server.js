@@ -7,7 +7,6 @@ const ExcelJS = require('exceljs')
 
 const app = express()
 
-// ===== CORS =====
 app.use(cors({
   origin: [
     "https://air-quality-frontend.onrender.com"
@@ -16,7 +15,6 @@ app.use(cors({
 
 app.use(express.json())
 
-// ===== SUPABASE =====
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
@@ -46,7 +44,7 @@ app.get('/data', async (req, res) => {
 
 
 // =============================
-// 📥 EXCEL PROFESIONAL COMPLETO
+// 📥 EXCEL CON PROMEDIOS REALES
 // =============================
 app.get('/download', async (req, res) => {
   try {
@@ -75,9 +73,7 @@ app.get('/download', async (req, res) => {
     worksheet.addRow([])
 
     // ===== ENCABEZADOS =====
-    const headerRowNumber = worksheet.rowCount + 1
-
-    const headerRow = worksheet.addRow([
+    worksheet.addRow([
       'Fecha',
       'Temperatura',
       'Humedad',
@@ -88,22 +84,6 @@ app.get('/download', async (req, res) => {
       'O3',
       'SO2'
     ])
-
-    headerRow.eachCell(cell => {
-      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FF1E40AF' }
-      }
-      cell.alignment = { horizontal: 'center' }
-      cell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' }
-      }
-    })
 
     worksheet.columns = [
       { width: 22 },
@@ -117,10 +97,18 @@ app.get('/download', async (req, res) => {
       { width: 10 }
     ]
 
-    // ===== FILA DONDE INICIAN DATOS =====
-    const firstDataRow = worksheet.rowCount + 1
+    // ===== VARIABLES PARA PROMEDIOS =====
+    let sumTemp = 0
+    let sumHum = 0
+    let sumPM25 = 0
+    let sumPM10 = 0
+    let sumCO = 0
+    let sumNO2 = 0
+    let sumO3 = 0
+    let sumSO2 = 0
 
     data.forEach(row => {
+
       worksheet.addRow([
         new Date(row.created_at).toLocaleString(),
         row.temperature,
@@ -132,50 +120,36 @@ app.get('/download', async (req, res) => {
         row.o3,
         row.so2
       ])
+
+      sumTemp += Number(row.temperature) || 0
+      sumHum += Number(row.humidity) || 0
+      sumPM25 += Number(row.pm25) || 0
+      sumPM10 += Number(row.pm10) || 0
+      sumCO += Number(row.co) || 0
+      sumNO2 += Number(row.no2) || 0
+      sumO3 += Number(row.o3) || 0
+      sumSO2 += Number(row.so2) || 0
     })
 
-    const lastDataRow = worksheet.rowCount
+    const total = data.length || 1
 
-    // ===== PROMEDIOS DINÁMICOS CORRECTOS =====
+    // ===== FILA PROMEDIOS CALCULADA EN BACKEND =====
     const avgRow = worksheet.addRow([
       'PROMEDIO',
-      { formula: `AVERAGE(B${firstDataRow}:B${lastDataRow})` },
-      { formula: `AVERAGE(C${firstDataRow}:C${lastDataRow})` },
-      { formula: `AVERAGE(D${firstDataRow}:D${lastDataRow})` },
-      { formula: `AVERAGE(E${firstDataRow}:E${lastDataRow})` },
-      { formula: `AVERAGE(F${firstDataRow}:F${lastDataRow})` },
-      { formula: `AVERAGE(G${firstDataRow}:G${lastDataRow})` },
-      { formula: `AVERAGE(H${firstDataRow}:H${lastDataRow})` },
-      { formula: `AVERAGE(I${firstDataRow}:I${lastDataRow})` }
+      (sumTemp / total).toFixed(2),
+      (sumHum / total).toFixed(2),
+      (sumPM25 / total).toFixed(2),
+      (sumPM10 / total).toFixed(2),
+      (sumCO / total).toFixed(2),
+      (sumNO2 / total).toFixed(2),
+      (sumO3 / total).toFixed(2),
+      (sumSO2 / total).toFixed(2)
     ])
 
     avgRow.eachCell(cell => {
       cell.font = { bold: true }
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFE5E7EB' }
-      }
-      cell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' }
-      }
-      cell.alignment = { horizontal: 'center' }
     })
 
-    // ===== FILTROS Y CONGELAR FILAS =====
-    worksheet.autoFilter = {
-      from: `A${headerRowNumber}`,
-      to: `I${lastDataRow}`
-    }
-
-    worksheet.views = [
-      { state: 'frozen', ySplit: headerRowNumber }
-    ]
-
-    // ===== DESCARGA =====
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
