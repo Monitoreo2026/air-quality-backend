@@ -41,7 +41,7 @@ app.get('/data', async (req, res) => {
 })
 
 // =============================
-// 📥 EXCEL PROFESIONAL AVANZADO
+// 📥 EXCEL PROFESIONAL CORREGIDO
 // =============================
 app.get('/download', async (req, res) => {
   try {
@@ -55,19 +55,21 @@ app.get('/download', async (req, res) => {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Reporte')
 
+    // ===== TITULO =====
     worksheet.mergeCells('A1:I1')
     const titleCell = worksheet.getCell('A1')
-    titleCell.value = 'INFORME GENERAL DE MONITOREO '
+    titleCell.value = 'INFORME GENERAL DE MONITOREO'
     titleCell.font = { size: 18, bold: true }
     titleCell.alignment = { horizontal: 'center', vertical: 'middle' }
 
     worksheet.mergeCells('A2:I2')
-    const subCell = worksheet.getCell('A2')
-    subCell.value = `Fecha de generación: ${new Date().toLocaleString()}`
-    subCell.alignment = { horizontal: 'center' }
+    worksheet.getCell('A2').value = `Fecha de generación: ${new Date().toLocaleString()}`
+    worksheet.getCell('A2').alignment = { horizontal: 'center' }
 
+    // ===== ESTADO ACTUAL =====
     if (data.length > 0) {
       const latest = data[0]
+
       let statusText = ''
       let statusColor = ''
 
@@ -84,7 +86,7 @@ app.get('/download', async (req, res) => {
 
       worksheet.mergeCells('A3:I3')
       const statusCell = worksheet.getCell('A3')
-      statusCell.value = `Estado actual de calidad del aire: ${statusText} (PM2.5 = ${latest.pm25})`
+      statusCell.value = `Estado actual: ${statusText} (PM2.5 = ${latest.pm25})`
       statusCell.alignment = { horizontal: 'center' }
       statusCell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
       statusCell.fill = {
@@ -96,6 +98,7 @@ app.get('/download', async (req, res) => {
 
     worksheet.addRow([])
 
+    // ===== ENCABEZADOS =====
     const headerRow = worksheet.addRow([
       'Fecha',
       'Temperatura',
@@ -115,7 +118,7 @@ app.get('/download', async (req, res) => {
         pattern: 'solid',
         fgColor: { argb: 'FF1E40AF' }
       }
-      cell.alignment = { horizontal: 'center', vertical: 'middle' }
+      cell.alignment = { horizontal: 'center' }
       cell.border = {
         top: { style: 'thin' },
         left: { style: 'thin' },
@@ -136,8 +139,9 @@ app.get('/download', async (req, res) => {
       { width: 10 }
     ]
 
+    // ===== DATOS =====
     data.forEach(row => {
-      const newRow = worksheet.addRow([
+      worksheet.addRow([
         new Date(row.created_at).toLocaleString(),
         row.temperature,
         row.humidity,
@@ -148,44 +152,36 @@ app.get('/download', async (req, res) => {
         row.o3,
         row.so2
       ])
+    })
 
-      const pmCell = newRow.getCell(4)
-
-      if (row.pm25 <= 50) {
-        pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16A34A' } }
-        pmCell.font = { color: { argb: 'FFFFFFFF' } }
-      } else if (row.pm25 <= 150) {
-        pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEAB308' } }
-      } else {
-        pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDC2626' } }
-        pmCell.font = { color: { argb: 'FFFFFFFF' } }
+    // ===== BORDES Y ESTILO =====
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber >= 5) {
+        row.eachCell(cell => {
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          }
+          cell.alignment = { horizontal: 'center' }
+        })
       }
     })
 
-    worksheet.eachRow(row => {
-      row.eachCell(cell => {
-        cell.border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' }
-        }
-        cell.alignment = { horizontal: 'center', vertical: 'middle' }
-      })
-    })
-
-    const lastRowNumber = worksheet.rowCount
+    // ===== PROMEDIOS CORREGIDOS =====
+    const totalRows = worksheet.rowCount
 
     const avgRow = worksheet.addRow([
       'PROMEDIO',
-      { formula: `AVERAGE(B6:B${lastRowNumber})` },
-      { formula: `AVERAGE(C6:C${lastRowNumber})` },
-      { formula: `AVERAGE(D6:D${lastRowNumber})` },
-      { formula: `AVERAGE(E6:E${lastRowNumber})` },
-      { formula: `AVERAGE(F6:F${lastRowNumber})` },
-      { formula: `AVERAGE(G6:G${lastRowNumber})` },
-      { formula: `AVERAGE(H6:H${lastRowNumber})` },
-      { formula: `AVERAGE(I6:I${lastRowNumber})` }
+      { formula: `AVERAGE(B6:B${totalRows})` },
+      { formula: `AVERAGE(C6:C${totalRows})` },
+      { formula: `AVERAGE(D6:D${totalRows})` },
+      { formula: `AVERAGE(E6:E${totalRows})` },
+      { formula: `AVERAGE(F6:F${totalRows})` },
+      { formula: `AVERAGE(G6:G${totalRows})` },
+      { formula: `AVERAGE(H6:H${totalRows})` },
+      { formula: `AVERAGE(I6:I${totalRows})` }
     ])
 
     avgRow.eachCell(cell => {
@@ -207,7 +203,7 @@ app.get('/download', async (req, res) => {
 
     worksheet.autoFilter = {
       from: 'A5',
-      to: 'I5'
+      to: `I${totalRows}`
     }
 
     res.setHeader(
