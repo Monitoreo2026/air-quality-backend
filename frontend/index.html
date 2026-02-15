@@ -2,12 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema de Monitoreo</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-
 :root {
   --bg:#0f172a;
   --card:#1e293b;
@@ -27,7 +25,6 @@ body{
   font-family:Segoe UI, Arial, sans-serif;
   background:var(--bg);
   color:var(--text);
-  transition:0.3s;
 }
 
 header{
@@ -37,83 +34,51 @@ header{
   justify-content:space-between;
   align-items:center;
   font-weight:600;
-  font-size:18px;
-  flex-wrap:wrap;
 }
 
 .status-indicator{
-  font-size:14px;
   display:flex;
-  align-items:center;
   gap:6px;
+  align-items:center;
 }
 
-.dot{ width:10px;height:10px;border-radius:50%; }
-.connected{ background:#16a34a; }
-.disconnected{ background:#dc2626; }
+.dot{width:10px;height:10px;border-radius:50%;}
+.connected{background:#16a34a;}
+.disconnected{background:#dc2626;}
 
-.container{ padding:20px; }
-
-.buttons{
-  margin-bottom:20px;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-button{
-  padding:8px 14px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:13px;
-  font-weight:600;
-}
-
-.download-btn{ background:#3b82f6; color:white; }
-.theme-btn{ background:#64748b; color:white; }
+.container{padding:20px;}
 
 .cards{
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-  margin-bottom:25px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:16px;
 }
 
 .card{
-  flex:1;
-  min-width:200px;
   background:var(--card);
-  padding:18px;
+  padding:16px;
   border-radius:12px;
   text-align:center;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
-}
-
-.card h2{
-  margin:10px 0;
-  font-size:clamp(20px, 5vw, 26px);
 }
 
 .status{
-  margin-top:10px;
+  margin-top:8px;
   padding:6px;
   border-radius:6px;
-  font-weight:600;
-  font-size:14px;
+  font-weight:700;
 }
 
-.good{ background:#16a34a; color:white; }
-.medium{ background:#eab308; color:black; }
-.bad{ background:#dc2626; color:white; }
+.good{background:#16a34a;}
+.medium{background:#eab308;color:#000;}
+.bad{background:#dc2626;}
 
 .alert-banner{
   display:none;
   background:#dc2626;
+  color:white;
   text-align:center;
-  padding:8px;
-  font-weight:600;
-  font-size:14px;
+  padding:10px;
+  font-weight:700;
   animation:blink 1s infinite;
 }
 
@@ -121,25 +86,18 @@ button{
   50%{opacity:0.6;}
 }
 
-/* 🔥 NUEVO CONTENEDOR PROFESIONAL PARA GRÁFICA */
-.chart-container{
-  position:relative;
-  width:100%;
-  height:350px;
+.trend{
+  font-size:18px;
+  margin-top:4px;
+}
+
+canvas{
+  margin-top:20px;
   background:var(--card);
-  padding:20px;
   border-radius:12px;
+  padding:12px;
+  max-height:280px;
 }
-
-/* 📱 Responsive */
-@media (max-width:768px){
-  .cards{ flex-direction:column; }
-  .buttons{ flex-direction:column; }
-  button{ width:100%; }
-  header{ flex-direction:column; text-align:center; gap:8px; }
-  .chart-container{ height:250px; }
-}
-
 </style>
 </head>
 
@@ -148,110 +106,116 @@ button{
 <header>
 🌫 Sistema de Monitoreo
 <div class="status-indicator">
-<div id="connectionDot" class="dot disconnected"></div>
-<span id="connectionText">Sin conexión</span>
+  <div id="connectionDot" class="dot disconnected"></div>
+  <span id="connectionText">Sin conexión</span>
 </div>
 </header>
 
 <div id="alert" class="alert-banner">
-⚠ PM2.5 en nivel crítico
+⚠ ALERTA: Calidad del aire CRÍTICA
 </div>
 
 <div class="container">
 
-<div class="buttons">
-<button class="download-btn" onclick="downloadExcel()">Descargar Excel</button>
-<button class="theme-btn" onclick="toggleTheme()">Cambiar tema</button>
-</div>
-
 <div class="cards">
-<div class="card"><div>Temperatura</div><h2 id="temp">-- °C</h2></div>
-<div class="card"><div>Humedad</div><h2 id="hum">-- %</h2></div>
-<div class="card"><div>PM2.5</div><h2 id="pm25">-- µg/m³</h2><div id="status" class="status">--</div></div>
-<div class="card"><div>PM10</div><h2 id="pm10">-- µg/m³</h2></div>
-<div class="card"><div>CO</div><h2 id="co">-- ppm</h2></div>
-<div class="card"><div>Promedio PM2.5 (10)</div><h2 id="average">--</h2></div>
+  <div class="card">
+    <div>Temperatura</div>
+    <h2 id="temp">-- °C</h2>
+  </div>
+
+  <div class="card">
+    <div>Humedad</div>
+    <h2 id="hum">-- %</h2>
+  </div>
+
+  <div class="card">
+    <div>PM2.5</div>
+    <h2 id="pm25">--</h2>
+    <div id="status" class="status">--</div>
+    <div id="trend" class="trend"></div>
+  </div>
 </div>
 
-<!-- 🔥 NUEVO CONTENEDOR -->
-<div class="chart-container">
 <canvas id="airChart"></canvas>
-</div>
 
 </div>
 
 <script>
+const API_URL = "https://air-quality-backend-66j2.onrender.com"
 
-const API_URL="https://air-quality-backend-66j2.onrender.com"
+let previousPM = null
+let lastStatus = ""
 
-const ctx=document.getElementById('airChart')
-
-const airChart=new Chart(ctx,{
-type:'line',
-data:{labels:[],datasets:[{
-label:'PM2.5',
-data:[],
-borderColor:'#3b82f6',
-backgroundColor:'rgba(59,130,246,0.2)',
-fill:true,
-tension:0.3
-}]},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{legend:{display:false}}
-}
+const ctx = document.getElementById('airChart').getContext('2d')
+const chart = new Chart(ctx,{
+  type:'line',
+  data:{labels:[],datasets:[{label:'PM2.5',data:[],borderWidth:3}]},
+  options:{responsive:true,maintainAspectRatio:false}
 })
 
-let lastStatus=""
-
-function getAirStatus(value){
-if(value<=12)return{text:"BUENO",class:"good",color:"#16a34a"}
-if(value<=35)return{text:"MODERADO",class:"medium",color:"#eab308"}
-return{text:"MALO",class:"bad",color:"#dc2626"}
+function getStatus(pm){
+  if(pm<=12) return {text:"BUENO",class:"good",color:"#16a34a"}
+  if(pm<=35) return {text:"MODERADO",class:"medium",color:"#eab308"}
+  return {text:"CRÍTICO",class:"bad",color:"#dc2626"}
 }
 
 async function loadData(){
-try{
-const response=await fetch(`${API_URL}/data`)
-const data=await response.json()
-if(!data.length)return
+  try{
+    const res = await fetch(`${API_URL}/data`)
+    const data = await res.json()
+    if(!data.length) return setDisconnected()
 
-document.getElementById('connectionDot').className="dot connected"
-document.getElementById('connectionText').innerText="Sistema conectado"
+    setConnected()
+    const latest = data[0]
 
-const latest=data[0]
+    document.getElementById('temp').innerText = latest.temperature+" °C"
+    document.getElementById('hum').innerText = latest.humidity+" %"
+    document.getElementById('pm25').innerText = latest.pm25
 
-document.getElementById('temp').innerText=latest.temperature+" °C"
-document.getElementById('hum').innerText=latest.humidity+" %"
-document.getElementById('pm25').innerText=latest.pm25+" µg/m³"
-document.getElementById('pm10').innerText=latest.pm10+" µg/m³"
-document.getElementById('co').innerText=latest.co+" ppm"
+    const statusInfo = getStatus(latest.pm25)
+    const statusDiv = document.getElementById('status')
+    statusDiv.innerText = statusInfo.text
+    statusDiv.className = "status "+statusInfo.class
 
-const avg=data.slice(0,10).reduce((sum,i)=>sum+i.pm25,0)/data.slice(0,10).length
-document.getElementById('average').innerText=avg.toFixed(2)
+    const alert = document.getElementById('alert')
+    if(statusInfo.text==="CRÍTICO"){
+      alert.style.display="block"
+      if(lastStatus!=="CRÍTICO"){
+        new Audio("https://www.soundjay.com/buttons/beep-02.mp3").play()
+      }
+    }else{
+      alert.style.display="none"
+    }
 
-airChart.data.labels=data.slice(0,10).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
-airChart.data.datasets[0].data=data.slice(0,10).map(d=>d.pm25).reverse()
-airChart.update()
+    const trend = document.getElementById('trend')
+    if(previousPM!==null){
+      trend.innerText = latest.pm25 > previousPM ? "⬆ Subiendo" : "⬇ Bajando"
+    }
+    previousPM = latest.pm25
+    lastStatus = statusInfo.text
 
-}catch{
-document.getElementById('connectionDot').className="dot disconnected"
-document.getElementById('connectionText').innerText="Sin conexión"
+    chart.data.labels = data.slice(0,10).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
+    chart.data.datasets[0].data = data.slice(0,10).map(d=>d.pm25).reverse()
+    chart.data.datasets[0].borderColor = statusInfo.color
+    chart.update()
+
+  }catch{
+    setDisconnected()
+  }
 }
+
+function setConnected(){
+  document.getElementById('connectionDot').className="dot connected"
+  document.getElementById('connectionText').innerText="Conectado"
 }
 
-function downloadExcel(){
-window.open(`${API_URL}/download`,'_blank')
-}
-
-function toggleTheme(){
-document.body.classList.toggle("light")
+function setDisconnected(){
+  document.getElementById('connectionDot').className="dot disconnected"
+  document.getElementById('connectionText').innerText="Sin conexión"
 }
 
 loadData()
 setInterval(loadData,5000)
-
 </script>
 
 </body>
