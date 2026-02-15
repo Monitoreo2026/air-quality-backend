@@ -2,11 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Sistema de Monitoreo </title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Monitoreo</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-/* TODO TU CSS IGUAL (no lo toqué) */
+
 :root {
   --bg:#0f172a;
   --card:#1e293b;
@@ -37,6 +38,7 @@ header{
   align-items:center;
   font-weight:600;
   font-size:18px;
+  flex-wrap:wrap;
 }
 
 .status-indicator{
@@ -52,10 +54,15 @@ header{
 
 .container{ padding:20px; }
 
-.buttons{ margin-bottom:20px; }
+.buttons{
+  margin-bottom:20px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
 
 button{
-  padding:7px 14px;
+  padding:8px 14px;
   border:none;
   border-radius:6px;
   cursor:pointer;
@@ -85,7 +92,7 @@ button{
 
 .card h2{
   margin:10px 0;
-  font-size:26px;
+  font-size:clamp(20px, 5vw, 26px);
 }
 
 .status{
@@ -118,7 +125,40 @@ canvas{
   background:var(--card);
   padding:20px;
   border-radius:12px;
+  width:100% !important;
+  height:auto !important;
 }
+
+/* ===================== */
+/* 📱 RESPONSIVE MOVIL */
+/* ===================== */
+
+@media (max-width: 768px) {
+
+  header{
+    flex-direction:column;
+    gap:8px;
+    text-align:center;
+  }
+
+  .cards{
+    flex-direction:column;
+  }
+
+  .card{
+    width:100%;
+  }
+
+  .buttons{
+    flex-direction:column;
+  }
+
+  button{
+    width:100%;
+  }
+
+}
+
 </style>
 </head>
 
@@ -197,7 +237,7 @@ borderColor:'#3b82f6',
 backgroundColor:'rgba(59,130,246,0.2)',
 tension:0.3
 }]},
-options:{responsive:true}
+options:{responsive:true, maintainAspectRatio:false}
 })
 
 let lastStatus=""
