@@ -121,42 +121,23 @@ button{
   50%{opacity:0.6;}
 }
 
-canvas{
+/* 🔥 NUEVO CONTENEDOR PROFESIONAL PARA GRÁFICA */
+.chart-container{
+  position:relative;
+  width:100%;
+  height:350px;
   background:var(--card);
   padding:20px;
   border-radius:12px;
-  width:100% !important;
-  height:auto !important;
 }
 
-/* ===================== */
-/* 📱 RESPONSIVE MOVIL */
-/* ===================== */
-
-@media (max-width: 768px) {
-
-  header{
-    flex-direction:column;
-    gap:8px;
-    text-align:center;
-  }
-
-  .cards{
-    flex-direction:column;
-  }
-
-  .card{
-    width:100%;
-  }
-
-  .buttons{
-    flex-direction:column;
-  }
-
-  button{
-    width:100%;
-  }
-
+/* 📱 Responsive */
+@media (max-width:768px){
+  .cards{ flex-direction:column; }
+  .buttons{ flex-direction:column; }
+  button{ width:100%; }
+  header{ flex-direction:column; text-align:center; gap:8px; }
+  .chart-container{ height:250px; }
 }
 
 </style>
@@ -184,60 +165,42 @@ canvas{
 </div>
 
 <div class="cards">
-
-<div class="card">
-<div>Temperatura</div>
-<h2 id="temp">-- °C</h2>
+<div class="card"><div>Temperatura</div><h2 id="temp">-- °C</h2></div>
+<div class="card"><div>Humedad</div><h2 id="hum">-- %</h2></div>
+<div class="card"><div>PM2.5</div><h2 id="pm25">-- µg/m³</h2><div id="status" class="status">--</div></div>
+<div class="card"><div>PM10</div><h2 id="pm10">-- µg/m³</h2></div>
+<div class="card"><div>CO</div><h2 id="co">-- ppm</h2></div>
+<div class="card"><div>Promedio PM2.5 (10)</div><h2 id="average">--</h2></div>
 </div>
 
-<div class="card">
-<div>Humedad</div>
-<h2 id="hum">-- %</h2>
-</div>
-
-<div class="card">
-<div>PM2.5</div>
-<h2 id="pm25">-- µg/m³</h2>
-<div id="status" class="status">--</div>
-</div>
-
-<div class="card">
-<div>PM10</div>
-<h2 id="pm10">-- µg/m³</h2>
-</div>
-
-<div class="card">
-<div>CO</div>
-<h2 id="co">-- ppm</h2>
-</div>
-
-<div class="card">
-<div>Promedio PM2.5 (10)</div>
-<h2 id="average">--</h2>
-</div>
-
-</div>
-
+<!-- 🔥 NUEVO CONTENEDOR -->
+<div class="chart-container">
 <canvas id="airChart"></canvas>
+</div>
 
 </div>
 
 <script>
 
-const API_URL = "https://air-quality-backend-66j2.onrender.com"
+const API_URL="https://air-quality-backend-66j2.onrender.com"
 
-const ctx=document.getElementById('airChart').getContext('2d')
+const ctx=document.getElementById('airChart')
 
 const airChart=new Chart(ctx,{
 type:'line',
-data:{ labels:[], datasets:[{
+data:{labels:[],datasets:[{
 label:'PM2.5',
 data:[],
 borderColor:'#3b82f6',
 backgroundColor:'rgba(59,130,246,0.2)',
+fill:true,
 tension:0.3
 }]},
-options:{responsive:true, maintainAspectRatio:false}
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{legend:{display:false}}
+}
 })
 
 let lastStatus=""
@@ -248,19 +211,14 @@ if(value<=35)return{text:"MODERADO",class:"medium",color:"#eab308"}
 return{text:"MALO",class:"bad",color:"#dc2626"}
 }
 
-function playAlertSound(){
-const audio=new Audio("https://www.soundjay.com/buttons/beep-02.mp3")
-audio.play()
-}
-
 async function loadData(){
 try{
 const response=await fetch(`${API_URL}/data`)
 const data=await response.json()
+if(!data.length)return
 
-if(!data.length){ setDisconnected(); return }
-
-setConnected()
+document.getElementById('connectionDot').className="dot connected"
+document.getElementById('connectionText').innerText="Sistema conectado"
 
 const latest=data[0]
 
@@ -270,52 +228,17 @@ document.getElementById('pm25').innerText=latest.pm25+" µg/m³"
 document.getElementById('pm10').innerText=latest.pm10+" µg/m³"
 document.getElementById('co').innerText=latest.co+" ppm"
 
-const avg=data.slice(0,10)
-.reduce((sum,item)=>sum+item.pm25,0)/data.slice(0,10).length
-
+const avg=data.slice(0,10).reduce((sum,i)=>sum+i.pm25,0)/data.slice(0,10).length
 document.getElementById('average').innerText=avg.toFixed(2)
 
-const statusInfo=getAirStatus(latest.pm25)
-const statusDiv=document.getElementById('status')
-statusDiv.innerText=statusInfo.text
-statusDiv.className="status "+statusInfo.class
-
-airChart.data.datasets[0].borderColor=statusInfo.color
-airChart.data.datasets[0].backgroundColor=statusInfo.color+"33"
-
-const alertBanner=document.getElementById('alert')
-if(statusInfo.text==="MALO"){
-alertBanner.style.display="block"
-if(lastStatus!=="MALO"){ playAlertSound() }
-}else{
-alertBanner.style.display="none"
-}
-
-lastStatus=statusInfo.text
-
-airChart.data.labels=data.slice(0,10)
-.map(d=>new Date(d.created_at).toLocaleTimeString())
-.reverse()
-
-airChart.data.datasets[0].data=data.slice(0,10)
-.map(d=>d.pm25)
-.reverse()
-
+airChart.data.labels=data.slice(0,10).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
+airChart.data.datasets[0].data=data.slice(0,10).map(d=>d.pm25).reverse()
 airChart.update()
 
 }catch{
-setDisconnected()
-}
-}
-
-function setConnected(){
-document.getElementById('connectionDot').className="dot connected"
-document.getElementById('connectionText').innerText="Sistema conectado"
-}
-
-function setDisconnected(){
 document.getElementById('connectionDot').className="dot disconnected"
 document.getElementById('connectionText').innerText="Sin conexión"
+}
 }
 
 function downloadExcel(){
@@ -324,12 +247,6 @@ window.open(`${API_URL}/download`,'_blank')
 
 function toggleTheme(){
 document.body.classList.toggle("light")
-localStorage.setItem("theme",
-document.body.classList.contains("light")?"light":"dark")
-}
-
-if(localStorage.getItem("theme")==="light"){
-document.body.classList.add("light")
 }
 
 loadData()
