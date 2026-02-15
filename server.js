@@ -7,6 +7,7 @@ const ExcelJS = require('exceljs')
 
 const app = express()
 
+// ===== CORS =====
 app.use(cors({
   origin: [
     "https://air-quality-frontend.onrender.com"
@@ -15,10 +16,12 @@ app.use(cors({
 
 app.use(express.json())
 
+// ===== SUPABASE =====
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 )
+
 
 // =============================
 // 📊 ENDPOINT DATOS
@@ -34,17 +37,20 @@ app.get('/data', async (req, res) => {
     if (error) throw error
 
     res.json(data)
+
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Error obteniendo datos' })
   }
 })
 
+
 // =============================
-// 📥 EXCEL PROFESIONAL CORREGIDO
+// 📥 EXCEL PROFESIONAL COMPLETO
 // =============================
 app.get('/download', async (req, res) => {
   try {
+
     const { data, error } = await supabase
       .from('air_readings')
       .select('*')
@@ -57,48 +63,20 @@ app.get('/download', async (req, res) => {
 
     // ===== TITULO =====
     worksheet.mergeCells('A1:I1')
-    const titleCell = worksheet.getCell('A1')
-    titleCell.value = 'INFORME GENERAL DE MONITOREO'
-    titleCell.font = { size: 18, bold: true }
-    titleCell.alignment = { horizontal: 'center', vertical: 'middle' }
+    worksheet.getCell('A1').value = 'INFORME GENERAL DE MONITOREO'
+    worksheet.getCell('A1').font = { size: 18, bold: true }
+    worksheet.getCell('A1').alignment = { horizontal: 'center' }
 
     worksheet.mergeCells('A2:I2')
-    worksheet.getCell('A2').value = `Fecha de generación: ${new Date().toLocaleString()}`
+    worksheet.getCell('A2').value =
+      `Fecha de generación: ${new Date().toLocaleString()}`
     worksheet.getCell('A2').alignment = { horizontal: 'center' }
-
-    // ===== ESTADO ACTUAL =====
-    if (data.length > 0) {
-      const latest = data[0]
-
-      let statusText = ''
-      let statusColor = ''
-
-      if (latest.pm25 <= 50) {
-        statusText = 'BUENO'
-        statusColor = 'FF16A34A'
-      } else if (latest.pm25 <= 150) {
-        statusText = 'MODERADO'
-        statusColor = 'FFEAB308'
-      } else {
-        statusText = 'CRITICO'
-        statusColor = 'FFDC2626'
-      }
-
-      worksheet.mergeCells('A3:I3')
-      const statusCell = worksheet.getCell('A3')
-      statusCell.value = `Estado actual: ${statusText} (PM2.5 = ${latest.pm25})`
-      statusCell.alignment = { horizontal: 'center' }
-      statusCell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
-      statusCell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: statusColor }
-      }
-    }
 
     worksheet.addRow([])
 
     // ===== ENCABEZADOS =====
+    const headerRowNumber = worksheet.rowCount + 1
+
     const headerRow = worksheet.addRow([
       'Fecha',
       'Temperatura',
@@ -139,7 +117,9 @@ app.get('/download', async (req, res) => {
       { width: 10 }
     ]
 
-    // ===== DATOS =====
+    // ===== FILA DONDE INICIAN DATOS =====
+    const firstDataRow = worksheet.rowCount + 1
+
     data.forEach(row => {
       worksheet.addRow([
         new Date(row.created_at).toLocaleString(),
@@ -154,34 +134,19 @@ app.get('/download', async (req, res) => {
       ])
     })
 
-    // ===== BORDES Y ESTILO =====
-    worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber >= 5) {
-        row.eachCell(cell => {
-          cell.border = {
-            top: { style: 'thin' },
-            left: { style: 'thin' },
-            bottom: { style: 'thin' },
-            right: { style: 'thin' }
-          }
-          cell.alignment = { horizontal: 'center' }
-        })
-      }
-    })
+    const lastDataRow = worksheet.rowCount
 
-    // ===== PROMEDIOS CORREGIDOS =====
-    const totalRows = worksheet.rowCount
-
+    // ===== PROMEDIOS DINÁMICOS CORRECTOS =====
     const avgRow = worksheet.addRow([
       'PROMEDIO',
-      { formula: `AVERAGE(B6:B${totalRows})` },
-      { formula: `AVERAGE(C6:C${totalRows})` },
-      { formula: `AVERAGE(D6:D${totalRows})` },
-      { formula: `AVERAGE(E6:E${totalRows})` },
-      { formula: `AVERAGE(F6:F${totalRows})` },
-      { formula: `AVERAGE(G6:G${totalRows})` },
-      { formula: `AVERAGE(H6:H${totalRows})` },
-      { formula: `AVERAGE(I6:I${totalRows})` }
+      { formula: `AVERAGE(B${firstDataRow}:B${lastDataRow})` },
+      { formula: `AVERAGE(C${firstDataRow}:C${lastDataRow})` },
+      { formula: `AVERAGE(D${firstDataRow}:D${lastDataRow})` },
+      { formula: `AVERAGE(E${firstDataRow}:E${lastDataRow})` },
+      { formula: `AVERAGE(F${firstDataRow}:F${lastDataRow})` },
+      { formula: `AVERAGE(G${firstDataRow}:G${lastDataRow})` },
+      { formula: `AVERAGE(H${firstDataRow}:H${lastDataRow})` },
+      { formula: `AVERAGE(I${firstDataRow}:I${lastDataRow})` }
     ])
 
     avgRow.eachCell(cell => {
@@ -197,15 +162,20 @@ app.get('/download', async (req, res) => {
         bottom: { style: 'thin' },
         right: { style: 'thin' }
       }
+      cell.alignment = { horizontal: 'center' }
     })
 
-    worksheet.views = [{ state: 'frozen', ySplit: 5 }]
-
+    // ===== FILTROS Y CONGELAR FILAS =====
     worksheet.autoFilter = {
-      from: 'A5',
-      to: `I${totalRows}`
+      from: `A${headerRowNumber}`,
+      to: `I${lastDataRow}`
     }
 
+    worksheet.views = [
+      { state: 'frozen', ySplit: headerRowNumber }
+    ]
+
+    // ===== DESCARGA =====
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -225,6 +195,8 @@ app.get('/download', async (req, res) => {
   }
 })
 
+
+// ===== SERVIDOR =====
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
