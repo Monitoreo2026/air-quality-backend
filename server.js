@@ -57,6 +57,12 @@ app.get('/download', async (req, res) => {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Reporte')
 
+    // ===== FUNCION HORA COLOMBIA =====
+    const fechaColombia = (fecha) =>
+      new Date(fecha).toLocaleString('es-CO', {
+        timeZone: 'America/Bogota'
+      })
+
     // ===== TITULO =====
     worksheet.mergeCells('A1:I1')
     const title = worksheet.getCell('A1')
@@ -66,7 +72,7 @@ app.get('/download', async (req, res) => {
 
     worksheet.mergeCells('A2:I2')
     worksheet.getCell('A2').value =
-      `Fecha de generación: ${new Date().toLocaleString()}`
+      `Fecha de generación: ${fechaColombia(new Date())}`
     worksheet.getCell('A2').alignment = { horizontal: 'center' }
 
     // ===== ESTADO ACTUAL =====
@@ -143,7 +149,7 @@ app.get('/download', async (req, res) => {
       { width: 10 }
     ]
 
-    // ===== SUMAS PARA PROMEDIOS =====
+    // ===== VARIABLES PROMEDIOS =====
     let sumTemp = 0
     let sumHum = 0
     let sumPM25 = 0
@@ -157,7 +163,7 @@ app.get('/download', async (req, res) => {
     data.forEach(row => {
 
       const newRow = worksheet.addRow([
-        new Date(row.created_at).toLocaleString(),
+        fechaColombia(row.created_at),
         row.temperature,
         row.humidity,
         row.pm25,
@@ -180,6 +186,7 @@ app.get('/download', async (req, res) => {
 
       // Color dinámico PM2.5
       const pmCell = newRow.getCell(4)
+
       if (row.pm25 <= 50) {
         pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16A34A' } }
         pmCell.font = { color: { argb: 'FFFFFFFF' } }
