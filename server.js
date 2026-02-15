@@ -8,9 +8,7 @@ const ExcelJS = require('exceljs')
 const app = express()
 
 app.use(cors({
-  origin: [
-    "https://air-quality-frontend.onrender.com"
-  ]
+  origin: ["https://air-quality-frontend.onrender.com"]
 }))
 
 app.use(express.json())
@@ -44,7 +42,7 @@ app.get('/data', async (req, res) => {
 
 
 // =============================
-// 📥 EXCEL CON PROMEDIOS REALES
+// 📥 EXCEL PROFESIONAL FINAL
 // =============================
 app.get('/download', async (req, res) => {
   try {
@@ -61,19 +59,51 @@ app.get('/download', async (req, res) => {
 
     // ===== TITULO =====
     worksheet.mergeCells('A1:I1')
-    worksheet.getCell('A1').value = 'INFORME GENERAL DE MONITOREO'
-    worksheet.getCell('A1').font = { size: 18, bold: true }
-    worksheet.getCell('A1').alignment = { horizontal: 'center' }
+    const title = worksheet.getCell('A1')
+    title.value = 'INFORME GENERAL DE MONITOREO'
+    title.font = { size: 18, bold: true }
+    title.alignment = { horizontal: 'center' }
 
     worksheet.mergeCells('A2:I2')
     worksheet.getCell('A2').value =
       `Fecha de generación: ${new Date().toLocaleString()}`
     worksheet.getCell('A2').alignment = { horizontal: 'center' }
 
+    // ===== ESTADO ACTUAL =====
+    if (data.length > 0) {
+      const latest = data[0]
+
+      let statusText = ''
+      let statusColor = ''
+
+      if (latest.pm25 <= 50) {
+        statusText = 'BUENO'
+        statusColor = 'FF16A34A'
+      } else if (latest.pm25 <= 150) {
+        statusText = 'MODERADO'
+        statusColor = 'FFEAB308'
+      } else {
+        statusText = 'CRITICO'
+        statusColor = 'FFDC2626'
+      }
+
+      worksheet.mergeCells('A3:I3')
+      const statusCell = worksheet.getCell('A3')
+      statusCell.value =
+        `Estado actual: ${statusText} (PM2.5 = ${latest.pm25})`
+      statusCell.alignment = { horizontal: 'center' }
+      statusCell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+      statusCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: statusColor }
+      }
+    }
+
     worksheet.addRow([])
 
     // ===== ENCABEZADOS =====
-    worksheet.addRow([
+    const headerRow = worksheet.addRow([
       'Fecha',
       'Temperatura',
       'Humedad',
@@ -84,6 +114,22 @@ app.get('/download', async (req, res) => {
       'O3',
       'SO2'
     ])
+
+    headerRow.eachCell(cell => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF1E40AF' }
+      }
+      cell.alignment = { horizontal: 'center' }
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      }
+    })
 
     worksheet.columns = [
       { width: 22 },
@@ -97,7 +143,7 @@ app.get('/download', async (req, res) => {
       { width: 10 }
     ]
 
-    // ===== VARIABLES PARA PROMEDIOS =====
+    // ===== SUMAS PARA PROMEDIOS =====
     let sumTemp = 0
     let sumHum = 0
     let sumPM25 = 0
@@ -107,9 +153,10 @@ app.get('/download', async (req, res) => {
     let sumO3 = 0
     let sumSO2 = 0
 
+    // ===== FILAS DE DATOS =====
     data.forEach(row => {
 
-      worksheet.addRow([
+      const newRow = worksheet.addRow([
         new Date(row.created_at).toLocaleString(),
         row.temperature,
         row.humidity,
@@ -120,6 +167,28 @@ app.get('/download', async (req, res) => {
         row.o3,
         row.so2
       ])
+
+      newRow.eachCell(cell => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        }
+        cell.alignment = { horizontal: 'center' }
+      })
+
+      // Color dinámico PM2.5
+      const pmCell = newRow.getCell(4)
+      if (row.pm25 <= 50) {
+        pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16A34A' } }
+        pmCell.font = { color: { argb: 'FFFFFFFF' } }
+      } else if (row.pm25 <= 150) {
+        pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEAB308' } }
+      } else {
+        pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDC2626' } }
+        pmCell.font = { color: { argb: 'FFFFFFFF' } }
+      }
 
       sumTemp += Number(row.temperature) || 0
       sumHum += Number(row.humidity) || 0
@@ -133,7 +202,7 @@ app.get('/download', async (req, res) => {
 
     const total = data.length || 1
 
-    // ===== FILA PROMEDIOS CALCULADA EN BACKEND =====
+    // ===== FILA PROMEDIOS =====
     const avgRow = worksheet.addRow([
       'PROMEDIO',
       (sumTemp / total).toFixed(2),
@@ -148,7 +217,21 @@ app.get('/download', async (req, res) => {
 
     avgRow.eachCell(cell => {
       cell.font = { bold: true }
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE5E7EB' }
+      }
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      }
+      cell.alignment = { horizontal: 'center' }
     })
+
+    worksheet.views = [{ state: 'frozen', ySplit: 5 }]
 
     res.setHeader(
       'Content-Type',
@@ -169,8 +252,6 @@ app.get('/download', async (req, res) => {
   }
 })
 
-
-// ===== SERVIDOR =====
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
