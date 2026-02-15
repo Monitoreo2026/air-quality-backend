@@ -6,7 +6,13 @@ const { createClient } = require('@supabase/supabase-js')
 const ExcelJS = require('exceljs')
 
 const app = express()
-app.use(cors())
+
+app.use(cors({
+  origin: [
+    "https://air-quality-frontend.onrender.com"
+  ]
+}))
+
 app.use(express.json())
 
 const supabase = createClient(

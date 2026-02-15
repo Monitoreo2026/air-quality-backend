@@ -6,6 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+/* TODO TU CSS IGUAL (no lo toqué) */
 :root {
   --bg:#0f172a;
   --card:#1e293b;
@@ -183,6 +184,8 @@ canvas{
 
 <script>
 
+const API_URL = "https://air-quality-backend-66j2.onrender.com"
+
 const ctx=document.getElementById('airChart').getContext('2d')
 
 const airChart=new Chart(ctx,{
@@ -212,7 +215,7 @@ audio.play()
 
 async function loadData(){
 try{
-const response=await fetch('http://localhost:3000/data')
+const response=await fetch(`${API_URL}/data`)
 const data=await response.json()
 
 if(!data.length){ setDisconnected(); return }
@@ -276,7 +279,7 @@ document.getElementById('connectionText').innerText="Sin conexión"
 }
 
 function downloadExcel(){
-window.open('http://localhost:3000/download','_blank')
+window.open(`${API_URL}/download`,'_blank')
 }
 
 function toggleTheme(){
