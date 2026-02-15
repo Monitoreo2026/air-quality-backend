@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sistema de Monitoreo </title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+  --bg:#0f172a;
+  --card:#1e293b;
+  --text:#ffffff;
+  --header:#1e293b;
+}
+
+body.light {
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --text:#0f172a;
+  --header:#e2e8f0;
+}
+
+body{
+  margin:0;
+  font-family:Segoe UI, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:0.3s;
+}
+
+header{
+  background:var(--header);
+  padding:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:600;
+  font-size:18px;
+}
+
+.status-indicator{
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.dot{ width:10px;height:10px;border-radius:50%; }
+.connected{ background:#16a34a; }
+.disconnected{ background:#dc2626; }
+
+.container{ padding:20px; }
+
+.buttons{ margin-bottom:20px; }
+
+button{
+  padding:7px 14px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:600;
+}
+
+.download-btn{ background:#3b82f6; color:white; }
+.theme-btn{ background:#64748b; color:white; }
+
+.cards{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  margin-bottom:25px;
+}
+
+.card{
+  flex:1;
+  min-width:200px;
+  background:var(--card);
+  padding:18px;
+  border-radius:12px;
+  text-align:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+.card h2{
+  margin:10px 0;
+  font-size:26px;
+}
+
+.status{
+  margin-top:10px;
+  padding:6px;
+  border-radius:6px;
+  font-weight:600;
+  font-size:14px;
+}
+
+.good{ background:#16a34a; color:white; }
+.medium{ background:#eab308; color:black; }
+.bad{ background:#dc2626; color:white; }
+
+.alert-banner{
+  display:none;
+  background:#dc2626;
+  text-align:center;
+  padding:8px;
+  font-weight:600;
+  font-size:14px;
+  animation:blink 1s infinite;
+}
+
+@keyframes blink{
+  50%{opacity:0.6;}
+}
+
+canvas{
+  background:var(--card);
+  padding:20px;
+  border-radius:12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+🌫 Sistema de Monitoreo
+<div class="status-indicator">
+<div id="connectionDot" class="dot disconnected"></div>
+<span id="connectionText">Sin conexión</span>
+</div>
+</header>
+
+<div id="alert" class="alert-banner">
+⚠ PM2.5 en nivel crítico
+</div>
+
+<div class="container">
+
+<div class="buttons">
+<button class="download-btn" onclick="downloadExcel()">Descargar Excel</button>
+<button class="theme-btn" onclick="toggleTheme()">Cambiar tema</button>
+</div>
+
+<div class="cards">
+
+<div class="card">
+<div>Temperatura</div>
+<h2 id="temp">-- °C</h2>
+</div>
+
+<div class="card">
+<div>Humedad</div>
+<h2 id="hum">-- %</h2>
+</div>
+
+<div class="card">
+<div>PM2.5</div>
+<h2 id="pm25">-- µg/m³</h2>
+<div id="status" class="status">--</div>
+</div>
+
+<div class="card">
+<div>PM10</div>
+<h2 id="pm10">-- µg/m³</h2>
+</div>
+
+<div class="card">
+<div>CO</div>
+<h2 id="co">-- ppm</h2>
+</div>
+
+<div class="card">
+<div>Promedio PM2.5 (10)</div>
+<h2 id="average">--</h2>
+</div>
+
+</div>
+
+<canvas id="airChart"></canvas>
+
+</div>
+
+<script>
+
+const ctx=document.getElementById('airChart').getContext('2d')
+
+const airChart=new Chart(ctx,{
+type:'line',
+data:{ labels:[], datasets:[{
+label:'PM2.5',
+data:[],
+borderColor:'#3b82f6',
+backgroundColor:'rgba(59,130,246,0.2)',
+tension:0.3
+}]},
+options:{responsive:true}
+})
+
+let lastStatus=""
+
+function getAirStatus(value){
+if(value<=12)return{text:"BUENO",class:"good",color:"#16a34a"}
+if(value<=35)return{text:"MODERADO",class:"medium",color:"#eab308"}
+return{text:"MALO",class:"bad",color:"#dc2626"}
+}
+
+function playAlertSound(){
+const audio=new Audio("https://www.soundjay.com/buttons/beep-02.mp3")
+audio.play()
+}
+
+async function loadData(){
+try{
+const response=await fetch('http://localhost:3000/data')
+const data=await response.json()
+
+if(!data.length){ setDisconnected(); return }
+
+setConnected()
+
+const latest=data[0]
+
+document.getElementById('temp').innerText=latest.temperature+" °C"
+document.getElementById('hum').innerText=latest.humidity+" %"
+document.getElementById('pm25').innerText=latest.pm25+" µg/m³"
+document.getElementById('pm10').innerText=latest.pm10+" µg/m³"
+document.getElementById('co').innerText=latest.co+" ppm"
+
+const avg=data.slice(0,10)
+.reduce((sum,item)=>sum+item.pm25,0)/data.slice(0,10).length
+
+document.getElementById('average').innerText=avg.toFixed(2)
+
+const statusInfo=getAirStatus(latest.pm25)
+const statusDiv=document.getElementById('status')
+statusDiv.innerText=statusInfo.text
+statusDiv.className="status "+statusInfo.class
+
+airChart.data.datasets[0].borderColor=statusInfo.color
+airChart.data.datasets[0].backgroundColor=statusInfo.color+"33"
+
+const alertBanner=document.getElementById('alert')
+if(statusInfo.text==="MALO"){
+alertBanner.style.display="block"
+if(lastStatus!=="MALO"){ playAlertSound() }
+}else{
+alertBanner.style.display="none"
+}
+
+lastStatus=statusInfo.text
+
+airChart.data.labels=data.slice(0,10)
+.map(d=>new Date(d.created_at).toLocaleTimeString())
+.reverse()
+
+airChart.data.datasets[0].data=data.slice(0,10)
+.map(d=>d.pm25)
+.reverse()
+
+airChart.update()
+
+}catch{
+setDisconnected()
+}
+}
+
+function setConnected(){
+document.getElementById('connectionDot').className="dot connected"
+document.getElementById('connectionText').innerText="Sistema conectado"
+}
+
+function setDisconnected(){
+document.getElementById('connectionDot').className="dot disconnected"
+document.getElementById('connectionText').innerText="Sin conexión"
+}
+
+function downloadExcel(){
+window.open('http://localhost:3000/download','_blank')
+}
+
+function toggleTheme(){
+document.body.classList.toggle("light")
+localStorage.setItem("theme",
+document.body.classList.contains("light")?"light":"dark")
+}
+
+if(localStorage.getItem("theme")==="light"){
+document.body.classList.add("light")
+}
+
+loadData()
+setInterval(loadData,5000)
+
+</script>
+
+</body>
+</html>
