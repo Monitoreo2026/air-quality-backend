@@ -3,32 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AirSense X | Smart Environmental Intelligence</title>
+<title>Sistema Inteligente de Calidad del Aire</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
-  --bg:#0a0f1f;
-  --card:rgba(255,255,255,0.05);
-  --glass:rgba(255,255,255,0.08);
+  --bg:#0f172a;
+  --card:#1e293b;
   --text:#f1f5f9;
   --muted:#94a3b8;
+  --glass:rgba(255,255,255,0.05);
 }
 
 body.light{
   --bg:#f1f5f9;
   --card:#ffffff;
-  --glass:rgba(0,0,0,0.05);
   --text:#0f172a;
   --muted:#475569;
+  --glass:rgba(0,0,0,0.04);
 }
 
 *{box-sizing:border-box}
 
 body{
   margin:0;
-  font-family:Inter,Segoe UI;
-  background:radial-gradient(circle at top left,#0f172a,#0a0f1f);
+  font-family:Inter,Segoe UI,Arial;
+  background:var(--bg);
   color:var(--text);
   transition:0.3s;
 }
@@ -39,9 +39,9 @@ header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:20px 40px;
-  backdrop-filter:blur(12px);
+  padding:18px 30px;
   background:var(--glass);
+  backdrop-filter:blur(10px);
   position:sticky;
   top:0;
   z-index:100;
@@ -50,7 +50,6 @@ header{
 .logo{
   font-weight:700;
   font-size:20px;
-  letter-spacing:1px;
 }
 
 .connection{
@@ -84,58 +83,70 @@ button{
 
 .hero{
   text-align:center;
-  padding:60px 20px 30px;
+  padding:50px 20px 20px;
 }
 
 .hero h1{
-  font-size:42px;
+  font-size:34px;
+  margin:0;
   background:linear-gradient(90deg,#3b82f6,#22c55e);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-  margin:0;
 }
 
 .hero p{
-  max-width:750px;
-  margin:20px auto;
+  max-width:700px;
+  margin:15px auto;
   color:var(--muted);
 }
 
-/* GAUGE */
+/* ESTADO GENERAL */
 
-.gauge-container{
+.main-status{
   text-align:center;
-  margin:40px 0;
+  margin:30px 0 15px;
 }
 
-.gauge{
-  position:relative;
-  width:200px;
-  height:200px;
-  margin:auto;
-}
-
-.gauge svg{
-  transform:rotate(-90deg);
-}
-
-.gauge-value{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  font-size:32px;
+.badge{
+  display:inline-block;
+  padding:10px 22px;
+  border-radius:25px;
   font-weight:700;
+  font-size:18px;
+  color:white;
 }
 
-.gauge-label{
-  font-size:14px;
+.update-time{
+  margin-top:8px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* BARRA RANGOS */
+
+.risk-bar{
+  display:flex;
+  max-width:600px;
+  margin:15px auto;
+  height:14px;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.risk-bar div{flex:1;}
+.good-zone{background:#22c55e;}
+.medium-zone{background:#eab308;}
+.bad-zone{background:#ef4444;}
+
+.range-labels{
+  text-align:center;
+  font-size:13px;
   color:var(--muted);
 }
 
 /* DASHBOARD */
 
-.dashboard{
+.container{
   max-width:1200px;
   margin:auto;
   padding:20px;
@@ -143,21 +154,22 @@ button{
 
 .cards{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
   gap:25px;
   margin-bottom:40px;
 }
 
 .card{
   background:var(--card);
-  backdrop-filter:blur(15px);
   padding:25px;
   border-radius:18px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.3);
+  box-shadow:0 8px 25px rgba(0,0,0,0.25);
   transition:0.3s;
 }
 
-.card:hover{transform:translateY(-6px);}
+.card:hover{
+  transform:translateY(-5px);
+}
 
 .card h3{
   margin:0;
@@ -166,35 +178,46 @@ button{
 }
 
 .card h2{
-  margin:12px 0;
+  margin:10px 0;
   font-size:30px;
 }
 
-.trend{font-size:14px;color:var(--muted);}
+.trend{
+  font-size:14px;
+  color:var(--muted);
+}
 
-/* CHART */
+/* GRÁFICA */
 
 .chart-container{
   background:var(--card);
   padding:25px;
-  border-radius:20px;
-  margin-bottom:40px;
+  border-radius:18px;
+  margin-bottom:50px;
 }
 
-canvas{height:420px !important;}
+canvas{
+  height:400px !important;
+}
 
-/* FOOTER */
+/* INFO */
 
-footer{
-  text-align:center;
+.info-section{
+  background:var(--card);
   padding:30px;
-  font-size:13px;
-  color:var(--muted);
+  border-radius:18px;
+  line-height:1.6;
 }
+
+.info-section h3{
+  margin-top:0;
+}
+
+/* RESPONSIVE */
 
 @media(max-width:768px){
-  header{flex-direction:column;gap:15px;}
-  .hero h1{font-size:28px;}
+  header{flex-direction:column;gap:12px;}
+  .hero h1{font-size:26px;}
   canvas{height:300px !important;}
 }
 </style>
@@ -203,41 +226,41 @@ footer{
 <body>
 
 <header>
-  <div class="logo">🌫 AirSense X</div>
+  <div class="logo">🌫 Sistema Inteligente de Calidad del Aire</div>
   <div style="display:flex;gap:15px;align-items:center;">
     <div class="connection">
       <div id="dot" class="dot disconnected"></div>
       <span id="connText">Sin conexión</span>
     </div>
-    <button class="download-btn" onclick="downloadExcel()">Excel</button>
+    <button class="download-btn" onclick="downloadExcel()">Descargar Excel</button>
     <button class="theme-btn" onclick="toggleTheme()">Modo</button>
   </div>
 </header>
 
 <section class="hero">
-  <h1>Environmental Intelligence Platform</h1>
+  <h1>Monitoreo en Tiempo Real de PM2.5</h1>
   <p>
-    Plataforma avanzada de análisis de calidad del aire con cálculo dinámico de índice AQI,
-    visualización en tiempo real y monitoreo inteligente de variables ambientales.
+    Plataforma de visualización ambiental que permite analizar la calidad del aire,
+    identificar riesgos y comprender el impacto de las partículas PM2.5 en la salud.
   </p>
 </section>
 
-<div class="gauge-container">
-  <div class="gauge">
-    <svg width="200" height="200">
-      <circle cx="100" cy="100" r="80" stroke="#334155" stroke-width="15" fill="none"/>
-      <circle id="gaugeFill" cx="100" cy="100" r="80" stroke="#22c55e"
-        stroke-width="15" fill="none"
-        stroke-dasharray="502"
-        stroke-dashoffset="502"
-        stroke-linecap="round"/>
-    </svg>
-    <div class="gauge-value" id="aqiValue">--</div>
+<div class="main-status">
+  <div id="badge" class="badge">--</div>
+  <div class="update-time" id="lastUpdate">Actualizando...</div>
+
+  <div class="risk-bar">
+    <div class="good-zone"></div>
+    <div class="medium-zone"></div>
+    <div class="bad-zone"></div>
   </div>
-  <div class="gauge-label">Índice AQI (EPA estimado)</div>
+
+  <div class="range-labels">
+    0–12 Buena | 13–35 Moderada | 36+ Crítica
+  </div>
 </div>
 
-<div class="dashboard">
+<div class="container">
 
 <div class="cards">
   <div class="card">
@@ -263,11 +286,29 @@ footer{
   <canvas id="chart"></canvas>
 </div>
 
+<div class="info-section">
+  <h3>¿Qué es el PM2.5?</h3>
+  <p>
+    El PM2.5 son partículas microscópicas suspendidas en el aire con un diámetro menor a 2.5 micrómetros.
+    Debido a su tamaño, pueden penetrar profundamente en los pulmones y afectar la salud respiratoria y cardiovascular.
+  </p>
+
+  <h3>Factores que empeoran la calidad del aire</h3>
+  <ul>
+    <li>Tráfico vehicular intenso</li>
+    <li>Quema de residuos o incendios</li>
+    <li>Emisiones industriales</li>
+  </ul>
+
+  <h3>Factores que la mejoran</h3>
+  <ul>
+    <li>Lluvias</li>
+    <li>Reducción del tráfico</li>
+    <li>Presencia de vegetación</li>
+  </ul>
 </div>
 
-<footer>
-AirSense X © 2026 | Advanced Environmental Monitoring System
-</footer>
+</div>
 
 <script>
 const API_URL="https://air-quality-backend-66j2.onrender.com"
@@ -296,27 +337,22 @@ const chart=new Chart(ctx,{
   scales:{
    x:{display:false}
   },
-  interaction:{mode:"index",intersect:false}
+  interaction:{mode:"index",intersect:false},
+  plugins:{
+   tooltip:{
+    callbacks:{
+     label:(c)=>`PM2.5: ${c.parsed.y} µg/m³`,
+     title:(c)=>c[0].label
+    }
+   }
+  }
  }
 })
 
-function calculateAQI(pm){
- if(pm<=12)return Math.round((50/12)*pm)
- if(pm<=35)return Math.round(50+((pm-12)*(50/23)))
- return Math.round(100+((pm-35)*2))
-}
-
-function updateGauge(aqi){
- const circle=document.getElementById("gaugeFill")
- const percent=Math.min(aqi,200)/200
- const offset=502-(502*percent)
- circle.style.strokeDashoffset=offset
-
- if(aqi<=50)circle.style.stroke="#22c55e"
- else if(aqi<=100)circle.style.stroke="#eab308"
- else circle.style.stroke="#ef4444"
-
- document.getElementById("aqiValue").innerText=aqi
+function getStatus(pm){
+ if(pm<=12)return {text:"Calidad del Aire: BUENA",color:"#22c55e"}
+ if(pm<=35)return {text:"Calidad del Aire: MODERADA",color:"#eab308"}
+ return {text:"Calidad del Aire: CRÍTICA",color:"#ef4444"}
 }
 
 async function loadData(){
@@ -334,8 +370,13 @@ async function loadData(){
   document.getElementById("hum").innerText=latest.humidity+" %"
   document.getElementById("pm").innerText=latest.pm25
 
-  const aqi=calculateAQI(latest.pm25)
-  updateGauge(aqi)
+  const status=getStatus(latest.pm25)
+  const badge=document.getElementById("badge")
+  badge.innerText=status.text
+  badge.style.background=status.color
+
+  document.getElementById("lastUpdate").innerText=
+   "Última actualización: "+new Date(latest.created_at).toLocaleString()
 
   if(previous.pm!=null){
    document.getElementById("pmTrend").innerText=latest.pm25>previous.pm?"⬆ Empeorando":"⬇ Mejorando"
