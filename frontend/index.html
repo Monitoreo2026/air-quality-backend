@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Monitoreo</title>
+<title>Sistema de Monitoreo de Calidad del Aire</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -53,12 +53,7 @@ header{
   gap:6px;
 }
 
-.dot{
-  width:10px;
-  height:10px;
-  border-radius:50%;
-}
-
+.dot{width:10px;height:10px;border-radius:50%;}
 .connected{background:#16a34a;}
 .disconnected{background:#dc2626;}
 
@@ -68,11 +63,6 @@ button{
   border-radius:8px;
   cursor:pointer;
   font-weight:600;
-  transition:0.2s;
-}
-
-button:hover{
-  transform:scale(1.05);
 }
 
 .download-btn{background:#2563eb;color:white;}
@@ -110,16 +100,6 @@ button:hover{
   border-radius:16px;
   text-align:center;
   box-shadow:0 4px 12px rgba(0,0,0,0.15);
-  transition:0.3s;
-}
-
-.card:hover{
-  transform:translateY(-3px);
-}
-
-.card h2{
-  margin:10px 0 0 0;
-  font-size:26px;
 }
 
 .status{
@@ -136,7 +116,6 @@ button:hover{
 .trend{
   margin-top:6px;
   font-size:14px;
-  opacity:0.9;
 }
 
 canvas{
@@ -147,42 +126,57 @@ canvas{
   height:320px !important;
 }
 
-/* ================= MOBILE ================= */
+/* EDUCATIONAL SECTION */
+
+.info-section{
+  margin-top:40px;
+  background:var(--card);
+  padding:25px;
+  border-radius:16px;
+  line-height:1.6;
+}
+
+.info-section h3{
+  margin-top:0;
+}
+
+.range-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+
+.range-table th,
+.range-table td{
+  padding:10px;
+  text-align:center;
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+.range-good{background:#16a34a;}
+.range-medium{background:#eab308;color:black;}
+.range-bad{background:#dc2626;}
 
 @media (max-width:768px){
-
   header{
     flex-direction:column;
     align-items:center;
     text-align:center;
   }
 
-  .header-left{
-    justify-content:center;
-  }
-
   header > div:last-child{
     width:100%;
     display:flex;
     justify-content:center;
-    gap:12px;
-  }
-
-  .container{
-    padding:20px 15px;
+    gap:10px;
   }
 
   .cards{
     grid-template-columns:1fr;
-    gap:16px;
-  }
-
-  .card{
-    padding:18px;
   }
 
   canvas{
-    height:260px !important;
+    height:250px !important;
   }
 }
 </style>
@@ -192,7 +186,7 @@ canvas{
 
 <header>
   <div class="header-left">
-    🌫 Sistema de Monitoreo
+    🌫 Sistema de Monitoreo Ambiental
     <div class="status-indicator">
       <div id="connectionDot" class="dot disconnected"></div>
       <span id="connectionText">Sin conexión</span>
@@ -223,7 +217,7 @@ canvas{
   </div>
 
   <div class="card">
-    <div>PM2.5</div>
+    <div>PM2.5 (µg/m³)</div>
     <h2 id="pm25">--</h2>
     <div id="status" class="status">--</div>
     <div id="trend" class="trend"></div>
@@ -231,6 +225,56 @@ canvas{
 </div>
 
 <canvas id="airChart"></canvas>
+
+<!-- EDUCATIONAL SECTION -->
+<div class="info-section">
+  <h3>¿Qué es el PM2.5?</h3>
+  <p>
+    El PM2.5 es material particulado con un diámetro menor a 2.5 micrómetros.
+    Estas partículas son tan pequeñas que pueden ingresar profundamente en los pulmones
+    y afectar el sistema respiratorio y cardiovascular.
+  </p>
+
+  <h3>Rangos de Calidad del Aire (PM2.5)</h3>
+  <table class="range-table">
+    <tr>
+      <th>Rango (µg/m³)</th>
+      <th>Estado</th>
+      <th>Impacto</th>
+    </tr>
+    <tr class="range-good">
+      <td>0 – 12</td>
+      <td>Bueno</td>
+      <td>Calidad del aire satisfactoria</td>
+    </tr>
+    <tr class="range-medium">
+      <td>13 – 35</td>
+      <td>Moderado</td>
+      <td>Personas sensibles pueden presentar molestias</td>
+    </tr>
+    <tr class="range-bad">
+      <td>36+</td>
+      <td>Crítico</td>
+      <td>Riesgo para la salud general</td>
+    </tr>
+  </table>
+
+  <h3>¿Qué empeora la calidad del aire?</h3>
+  <ul>
+    <li>Tráfico vehicular</li>
+    <li>Industria y fábricas</li>
+    <li>Quema de residuos</li>
+    <li>Incendios forestales</li>
+  </ul>
+
+  <h3>¿Qué la mejora?</h3>
+  <ul>
+    <li>Reducción de emisiones</li>
+    <li>Uso de transporte sostenible</li>
+    <li>Mayor vegetación y zonas verdes</li>
+    <li>Lluvia y condiciones climáticas favorables</li>
+  </ul>
+</div>
 
 </div>
 
@@ -243,10 +287,28 @@ let lastStatus = ""
 const ctx = document.getElementById('airChart').getContext('2d')
 const chart = new Chart(ctx,{
   type:'line',
-  data:{labels:[],datasets:[{label:'PM2.5',data:[],borderWidth:3}]},
+  data:{labels:[],datasets:[{
+    label:'Concentración PM2.5 (µg/m³)',
+    data:[],
+    borderWidth:3,
+    tension:0.4,
+    pointRadius:5
+  }]},
   options:{
     responsive:true,
     maintainAspectRatio:false,
+    plugins:{
+      tooltip:{
+        callbacks:{
+          label:function(context){
+            return "PM2.5: "+context.raw+" µg/m³"
+          },
+          title:function(context){
+            return context[0].label
+          }
+        }
+      }
+    },
     scales:{
       y:{beginAtZero:true}
     }
@@ -280,9 +342,6 @@ async function loadData(){
     const alert = document.getElementById('alert')
     if(statusInfo.text==="CRÍTICO"){
       alert.style.display="block"
-      if(lastStatus!=="CRÍTICO"){
-        new Audio("https://www.soundjay.com/buttons/beep-02.mp3").play()
-      }
     }else{
       alert.style.display="none"
     }
@@ -294,7 +353,10 @@ async function loadData(){
     previousPM = latest.pm25
     lastStatus = statusInfo.text
 
-    chart.data.labels = data.slice(0,10).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
+    chart.data.labels = data.slice(0,10).map(d=>
+      new Date(d.created_at).toLocaleString('es-CO',{timeZone:'America/Bogota'})
+    ).reverse()
+
     chart.data.datasets[0].data = data.slice(0,10).map(d=>d.pm25).reverse()
     chart.data.datasets[0].borderColor = statusInfo.color
     chart.update()
