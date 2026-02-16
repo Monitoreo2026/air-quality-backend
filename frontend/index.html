@@ -3,16 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AirSense Pro | Monitoreo Inteligente</title>
+<title>AirSense X | Smart Environmental Intelligence</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script>
 
 <style>
 :root{
-  --bg:#0b1220;
+  --bg:#0a0f1f;
   --card:rgba(255,255,255,0.05);
   --glass:rgba(255,255,255,0.08);
-  --text:#f8fafc;
+  --text:#f1f5f9;
   --muted:#94a3b8;
 }
 
@@ -24,13 +23,17 @@ body.light{
   --muted:#475569;
 }
 
+*{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:Inter,Segoe UI;
-  background:var(--bg);
+  background:radial-gradient(circle at top left,#0f172a,#0a0f1f);
   color:var(--text);
   transition:0.3s;
 }
+
+/* HEADER */
 
 header{
   display:flex;
@@ -41,7 +44,7 @@ header{
   background:var(--glass);
   position:sticky;
   top:0;
-  z-index:10;
+  z-index:100;
 }
 
 .logo{
@@ -54,6 +57,7 @@ header{
   display:flex;
   align-items:center;
   gap:8px;
+  font-size:14px;
 }
 
 .dot{
@@ -76,13 +80,15 @@ button{
 .download-btn{background:#2563eb;color:white;}
 .theme-btn{background:#64748b;color:white;}
 
+/* HERO */
+
 .hero{
   text-align:center;
   padding:60px 20px 30px;
 }
 
 .hero h1{
-  font-size:40px;
+  font-size:42px;
   background:linear-gradient(90deg,#3b82f6,#22c55e);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
@@ -94,6 +100,40 @@ button{
   margin:20px auto;
   color:var(--muted);
 }
+
+/* GAUGE */
+
+.gauge-container{
+  text-align:center;
+  margin:40px 0;
+}
+
+.gauge{
+  position:relative;
+  width:200px;
+  height:200px;
+  margin:auto;
+}
+
+.gauge svg{
+  transform:rotate(-90deg);
+}
+
+.gauge-value{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:32px;
+  font-weight:700;
+}
+
+.gauge-label{
+  font-size:14px;
+  color:var(--muted);
+}
+
+/* DASHBOARD */
 
 .dashboard{
   max-width:1200px;
@@ -117,9 +157,7 @@ button{
   transition:0.3s;
 }
 
-.card:hover{
-  transform:translateY(-6px);
-}
+.card:hover{transform:translateY(-6px);}
 
 .card h3{
   margin:0;
@@ -129,13 +167,12 @@ button{
 
 .card h2{
   margin:12px 0;
-  font-size:32px;
+  font-size:30px;
 }
 
-.trend{
-  font-size:14px;
-  color:var(--muted);
-}
+.trend{font-size:14px;color:var(--muted);}
+
+/* CHART */
 
 .chart-container{
   background:var(--card);
@@ -144,21 +181,9 @@ button{
   margin-bottom:40px;
 }
 
-canvas{
-  height:420px !important;
-}
+canvas{height:420px !important;}
 
-.info{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:20px;
-}
-
-.info-card{
-  background:var(--card);
-  padding:25px;
-  border-radius:16px;
-}
+/* FOOTER */
 
 footer{
   text-align:center;
@@ -178,7 +203,7 @@ footer{
 <body>
 
 <header>
-  <div class="logo">🌫 AirSense Pro</div>
+  <div class="logo">🌫 AirSense X</div>
   <div style="display:flex;gap:15px;align-items:center;">
     <div class="connection">
       <div id="dot" class="dot disconnected"></div>
@@ -190,12 +215,27 @@ footer{
 </header>
 
 <section class="hero">
-  <h1>Monitoreo Inteligente de Calidad del Aire</h1>
+  <h1>Environmental Intelligence Platform</h1>
   <p>
-    Plataforma avanzada de visualización ambiental en tiempo real.
-    Permite analizar concentración de partículas PM2.5, tendencias y riesgos para la salud.
+    Plataforma avanzada de análisis de calidad del aire con cálculo dinámico de índice AQI,
+    visualización en tiempo real y monitoreo inteligente de variables ambientales.
   </p>
 </section>
+
+<div class="gauge-container">
+  <div class="gauge">
+    <svg width="200" height="200">
+      <circle cx="100" cy="100" r="80" stroke="#334155" stroke-width="15" fill="none"/>
+      <circle id="gaugeFill" cx="100" cy="100" r="80" stroke="#22c55e"
+        stroke-width="15" fill="none"
+        stroke-dasharray="502"
+        stroke-dashoffset="502"
+        stroke-linecap="round"/>
+    </svg>
+    <div class="gauge-value" id="aqiValue">--</div>
+  </div>
+  <div class="gauge-label">Índice AQI (EPA estimado)</div>
+</div>
 
 <div class="dashboard">
 
@@ -223,25 +263,10 @@ footer{
   <canvas id="chart"></canvas>
 </div>
 
-<div class="info">
-  <div class="info-card">
-    <h4>¿Qué es PM2.5?</h4>
-    Son partículas microscópicas menores a 2.5 µm que pueden ingresar profundamente en los pulmones.
-  </div>
-  <div class="info-card">
-    <h4>Riesgos</h4>
-    Exposición prolongada puede generar enfermedades respiratorias y cardiovasculares.
-  </div>
-  <div class="info-card">
-    <h4>Factores que influyen</h4>
-    Tráfico, industria, incendios, condiciones climáticas.
-  </div>
-</div>
-
 </div>
 
 <footer>
-AirSense Pro © 2026 | Sistema Inteligente de Monitoreo Ambiental
+AirSense X © 2026 | Advanced Environmental Monitoring System
 </footer>
 
 <script>
@@ -268,9 +293,31 @@ const chart=new Chart(ctx,{
  options:{
   responsive:true,
   maintainAspectRatio:false,
+  scales:{
+   x:{display:false}
+  },
   interaction:{mode:"index",intersect:false}
  }
 })
+
+function calculateAQI(pm){
+ if(pm<=12)return Math.round((50/12)*pm)
+ if(pm<=35)return Math.round(50+((pm-12)*(50/23)))
+ return Math.round(100+((pm-35)*2))
+}
+
+function updateGauge(aqi){
+ const circle=document.getElementById("gaugeFill")
+ const percent=Math.min(aqi,200)/200
+ const offset=502-(502*percent)
+ circle.style.strokeDashoffset=offset
+
+ if(aqi<=50)circle.style.stroke="#22c55e"
+ else if(aqi<=100)circle.style.stroke="#eab308"
+ else circle.style.stroke="#ef4444"
+
+ document.getElementById("aqiValue").innerText=aqi
+}
 
 async function loadData(){
  try{
@@ -286,6 +333,9 @@ async function loadData(){
   document.getElementById("temp").innerText=latest.temperature+" °C"
   document.getElementById("hum").innerText=latest.humidity+" %"
   document.getElementById("pm").innerText=latest.pm25
+
+  const aqi=calculateAQI(latest.pm25)
+  updateGauge(aqi)
 
   if(previous.pm!=null){
    document.getElementById("pmTrend").innerText=latest.pm25>previous.pm?"⬆ Empeorando":"⬇ Mejorando"
