@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- FUENTE MODERNA -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <title>Sistema Inteligente de Calidad del Aire</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -10,31 +14,37 @@
 :root{
   --bg:#0f172a;
   --card:#1e293b;
-  --text:#f1f5f9;
+  --text:#f8fafc;
   --muted:#94a3b8;
-}
-
-body.light{
-  --bg:#f1f5f9;
-  --card:#ffffff;
-  --text:#0f172a;
-  --muted:#475569;
 }
 
 body{
   margin:0;
-  font-family:Inter,Segoe UI,Arial;
+  font-family:'Inter', sans-serif;
   background:var(--bg);
   color:var(--text);
-  transition:0.4s;
+  transition:background 0.4s ease, color 0.4s ease;
 }
 
-/* CONTENEDOR GENERAL */
+/* ANIMACIONES */
+
+.fade-up{
+  opacity:0;
+  transform:translateY(30px);
+  transition:all 0.8s cubic-bezier(.16,1,.3,1);
+}
+
+.fade-up.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* CONTENEDOR */
 
 .wrapper{
   max-width:1200px;
   margin:auto;
-  padding:40px 20px;
+  padding:60px 20px;
 }
 
 /* HEADER */
@@ -43,19 +53,20 @@ header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding-bottom:30px;
+  margin-bottom:60px;
 }
 
 .brand{
-  font-weight:700;
+  font-weight:600;
   font-size:20px;
+  letter-spacing:-0.3px;
 }
 
 .status{
-  font-size:14px;
   display:flex;
   align-items:center;
   gap:8px;
+  font-size:14px;
 }
 
 .dot{
@@ -69,58 +80,68 @@ header{
 
 button{
   border:none;
-  padding:8px 14px;
-  border-radius:8px;
+  padding:8px 16px;
+  border-radius:10px;
   cursor:pointer;
-  font-weight:600;
-  margin-left:8px;
+  font-weight:500;
+  transition:all 0.3s ease;
+}
+
+button:hover{
+  transform:translateY(-2px);
 }
 
 .download-btn{background:#2563eb;color:white}
-.theme-btn{background:#64748b;color:white}
+.theme-btn{background:#334155;color:white}
 
 /* HERO */
 
 .hero{
   text-align:center;
-  margin-bottom:50px;
+  margin-bottom:60px;
 }
 
 .hero h1{
-  font-size:36px;
-  margin-bottom:10px;
+  font-size:42px;
+  font-weight:700;
+  letter-spacing:-1px;
   background:linear-gradient(90deg,#3b82f6,#22c55e);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
 }
 
 .hero p{
-  max-width:750px;
-  margin:auto;
+  max-width:700px;
+  margin:20px auto;
   color:var(--muted);
+  font-weight:400;
 }
 
-.live-clock{
-  margin-top:10px;
+.clock{
   font-size:14px;
   color:var(--muted);
 }
 
-/* INDICADOR PRINCIPAL */
+/* TARJETA PRINCIPAL */
 
 .main-card{
   background:var(--card);
-  padding:40px;
-  border-radius:24px;
+  padding:50px;
+  border-radius:28px;
   text-align:center;
-  box-shadow:0 15px 40px rgba(0,0,0,0.35);
-  margin-bottom:50px;
+  margin-bottom:60px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  transition:all 0.4s ease;
+}
+
+.main-card:hover{
+  transform:translateY(-6px);
 }
 
 .pm-big{
-  font-size:70px;
+  font-size:72px;
   font-weight:700;
-  transition:0.4s;
+  transition:all 0.4s ease;
 }
 
 .pm-status{
@@ -129,19 +150,15 @@ button{
 }
 
 .recommendation{
-  font-size:15px;
   margin-top:10px;
   color:var(--muted);
 }
 
-/* BARRA DINÁMICA */
-
-.bar-container{
-  max-width:600px;
-  margin:25px auto 0;
-}
+/* BARRA */
 
 .bar{
+  margin:30px auto 0;
+  max-width:600px;
   height:14px;
   border-radius:10px;
   background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);
@@ -151,89 +168,64 @@ button{
 .marker{
   width:18px;
   height:18px;
-  border-radius:50%;
   background:white;
+  border-radius:50%;
   position:absolute;
   top:-2px;
   transform:translateX(-50%);
-  transition:0.4s;
+  transition:0.4s ease;
 }
 
-/* GRID METRICAS */
+/* METRICAS */
 
 .metrics{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:25px;
-  margin-bottom:50px;
+  gap:30px;
+  margin-bottom:60px;
 }
 
 .metric-card{
   background:var(--card);
-  padding:30px;
-  border-radius:20px;
+  padding:35px;
+  border-radius:24px;
   text-align:center;
-  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  transition:all 0.3s ease;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-.metric-card h3{
-  color:var(--muted);
-  font-size:14px;
-  margin-bottom:10px;
-}
-
-.metric-card h2{
-  font-size:32px;
+.metric-card:hover{
+  transform:translateY(-6px);
 }
 
 /* ANALISIS */
 
 .analysis{
   background:var(--card);
-  padding:30px;
-  border-radius:20px;
-  margin-bottom:50px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  padding:35px;
+  border-radius:24px;
+  margin-bottom:60px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 /* GRAFICA */
 
 .chart-card{
   background:var(--card);
-  padding:30px;
-  border-radius:20px;
-  height:450px;
-  margin-bottom:60px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.25);
-}
-
-/* INFO */
-
-.info-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:25px;
-}
-
-.info-card{
-  background:var(--card);
-  padding:25px;
-  border-radius:20px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+  padding:35px;
+  border-radius:24px;
+  height:500px;
+  margin-bottom:80px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 /* FOOTER */
 
 footer{
-  margin-top:80px;
   text-align:center;
-  color:var(--muted);
   font-size:14px;
-  padding-bottom:30px;
-}
-
-@media(max-width:768px){
-  .pm-big{font-size:50px}
+  color:var(--muted);
+  padding-bottom:40px;
 }
 </style>
 </head>
@@ -242,37 +234,31 @@ footer{
 
 <div class="wrapper">
 
-<header>
+<header class="fade-up">
 <div class="brand">🌫 Sistema Inteligente de Calidad del Aire</div>
-<div style="display:flex;align-items:center;">
 <div class="status">
 <div id="dot" class="dot disconnected"></div>
 <span id="statusText">Sin conexión</span>
-</div>
 <button class="download-btn" onclick="downloadExcel()">Excel</button>
-<button class="theme-btn" onclick="toggleTheme()">Modo</button>
 </div>
 </header>
 
-<section class="hero">
+<section class="hero fade-up">
 <h1>Monitoreo Inteligente de PM2.5</h1>
-<p>Plataforma IoT para visualización, análisis y evaluación de riesgos ambientales en tiempo real.</p>
-<div class="live-clock" id="clock"></div>
+<p>Plataforma IoT para análisis ambiental avanzado en tiempo real.</p>
+<div class="clock" id="clock"></div>
 </section>
 
-<div class="main-card">
+<div class="main-card fade-up">
 <div class="pm-big" id="pmBig">--</div>
-<div class="pm-status" id="pmStatus">Cargando...</div>
+<div class="pm-status" id="pmStatus"></div>
 <div class="recommendation" id="recommendation"></div>
-
-<div class="bar-container">
 <div class="bar">
 <div class="marker" id="marker"></div>
 </div>
 </div>
-</div>
 
-<div class="metrics">
+<div class="metrics fade-up">
 <div class="metric-card">
 <h3>Temperatura</h3>
 <h2 id="temp">--</h2>
@@ -283,35 +269,16 @@ footer{
 </div>
 </div>
 
-<div class="analysis">
+<div class="analysis fade-up">
 <h3>Análisis Inteligente</h3>
 <p id="analysisText">Procesando datos...</p>
 </div>
 
-<div class="chart-card">
+<div class="chart-card fade-up">
 <canvas id="chart"></canvas>
 </div>
 
-<div class="info-grid">
-<div class="info-card">
-<h3>Definición Técnica</h3>
-<p>PM2.5 son partículas finas ≤2.5µm que penetran profundamente en el sistema respiratorio.</p>
-</div>
-<div class="info-card">
-<h3>Impacto en Salud</h3>
-<p>Asociado con enfermedades respiratorias y cardiovasculares, especialmente en población vulnerable.</p>
-</div>
-<div class="info-card">
-<h3>Normativa OMS</h3>
-<p>La OMS recomienda mantener niveles anuales por debajo de 5 µg/m³.</p>
-</div>
-<div class="info-card">
-<h3>Aplicación IoT</h3>
-<p>El monitoreo continuo mediante sensores permite análisis predictivo y toma de decisiones informada.</p>
-</div>
-</div>
-
-<footer>
+<footer class="fade-up">
 Plataforma desarrollada por<br>
 <strong>Santiago Rubio & Jheferson Imbachi</strong><br>
 Proyecto de Ingeniería Informática – 2026
@@ -322,8 +289,19 @@ Proyecto de Ingeniería Informática – 2026
 <script>
 const API_URL="https://air-quality-backend-66j2.onrender.com"
 
+/* ANIMACION SCROLL */
+const observer=new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+entry.target.classList.add("visible")
+}
+})
+})
+document.querySelectorAll(".fade-up").forEach(el=>observer.observe(el))
+
+/* RELOJ */
 function updateClock(){
-document.getElementById("clock").innerText="Fecha y hora actual: "+new Date().toLocaleString()
+document.getElementById("clock").innerText=new Date().toLocaleString()
 }
 setInterval(updateClock,1000)
 updateClock()
@@ -348,16 +326,19 @@ const [status,color,reco]=getStatus(latest.pm25)
 
 document.getElementById("pmBig").innerText=latest.pm25
 document.getElementById("pmBig").style.color=color
-document.getElementById("pmStatus").innerText="Calidad: "+status
+document.getElementById("pmStatus").innerText=status
 document.getElementById("recommendation").innerText=reco
 
 document.getElementById("temp").innerText=latest.temperature+" °C"
 document.getElementById("hum").innerText=latest.humidity+" %"
 
 document.getElementById("analysisText").innerText=
-`La concentración actual es ${latest.pm25} µg/m³ (${status}). Tendencia ${data[1] && latest.pm25>data[1].pm25?"ascendente":"estable o descendente"} respecto a la medición anterior.`
+`Nivel actual ${latest.pm25} µg/m³ (${status}). Tendencia ${
+data[1] && latest.pm25>data[1].pm25?"ascendente":"estable o descendente"
+}.`
 
-document.getElementById("marker").style.left=Math.min((latest.pm25/60)*100,100)+"%"
+document.getElementById("marker").style.left=
+Math.min((latest.pm25/60)*100,100)+"%"
 
 chart.data.labels=data.slice(0,20).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
 chart.data.datasets[0].data=data.slice(0,20).map(d=>d.pm25).reverse()
@@ -379,29 +360,17 @@ borderColor:"#3b82f6",
 backgroundColor:gradient,
 fill:true,
 tension:0.45,
-pointRadius:3
+pointRadius:2
 }]},
 options:{
 responsive:true,
 maintainAspectRatio:false,
-plugins:{
-legend:{display:false},
-tooltip:{
-backgroundColor:"#1e293b",
-titleColor:"#fff",
-bodyColor:"#fff",
-padding:10
-}
-},
-scales:{
-x:{grid:{display:false}},
-y:{grid:{color:"rgba(255,255,255,0.05)"}}
-}
+plugins:{legend:{display:false}},
+scales:{x:{grid:{display:false}},y:{grid:{color:"rgba(255,255,255,0.05)"}}}
 }
 })
 
 function downloadExcel(){window.open(`${API_URL}/download`)}
-function toggleTheme(){document.body.classList.toggle("light")}
 
 loadData()
 setInterval(loadData,5000)
