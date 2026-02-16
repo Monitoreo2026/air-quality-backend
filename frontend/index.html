@@ -152,56 +152,41 @@ margin-top:10px;
 color:var(--muted);
 }
 
-/* ===== BARRA PREMIUM ===== */
-
-.bar-wrapper{
-max-width:650px;
-margin:40px auto 0;
-}
-
 .bar{
-height:16px;
-border-radius:20px;
-background:linear-gradient(90deg,
-#22c55e 0%,#22c55e 33%,
-#eab308 33%,#eab308 66%,
-#ef4444 66%,#ef4444 100%);
+margin:35px auto 0;
+max-width:600px;
+height:14px;
+border-radius:10px;
+background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);
 position:relative;
-box-shadow:inset 0 0 15px rgba(0,0,0,0.4);
 }
 
 .marker{
-width:22px;
-height:22px;
+width:18px;
+height:18px;
 background:white;
 border-radius:50%;
 position:absolute;
-top:-3px;
+top:-2px;
 transform:translateX(-50%);
-transition:.6s cubic-bezier(.16,1,.3,1);
-box-shadow:0 0 15px rgba(255,255,255,0.7);
+transition:.5s;
 }
+
+/* NUEVA BARRA DE RANGOS */
 
 .range-labels{
 display:flex;
 justify-content:space-between;
-margin-top:14px;
+margin-top:12px;
+max-width:600px;
+margin-left:auto;
+margin-right:auto;
 font-size:13px;
-font-weight:600;
-letter-spacing:0.3px;
+font-weight:500;
 }
 
 .range{
-padding:4px 10px;
-border-radius:20px;
-opacity:.5;
-transition:.4s;
-}
-
-.range.active{
-opacity:1;
-transform:scale(1.05);
-box-shadow:0 0 15px rgba(255,255,255,0.1);
+opacity:0.85;
 }
 
 .range.good{color:#22c55e}
@@ -327,17 +312,17 @@ padding-top:30px;
 <div class="pm-label" id="pmLabel"></div>
 <div class="pm-info" id="pmInfo"></div>
 
-<div class="bar-wrapper">
 <div class="bar">
 <div class="marker" id="marker"></div>
 </div>
 
+<!-- NUEVA BARRA INFORMATIVA -->
 <div class="range-labels">
-<span id="rangeGood" class="range good">0 – 12 Buena</span>
-<span id="rangeModerate" class="range moderate">12 – 35 Moderada</span>
-<span id="rangeBad" class="range bad">35+ Crítica</span>
+<span class="range good">0 – 12 Buena</span>
+<span class="range moderate">12 – 35 Moderada</span>
+<span class="range bad">35+ Crítica</span>
 </div>
-</div>
+
 </div>
 
 <div class="metrics fade">
@@ -387,6 +372,13 @@ Proyecto de Ingeniería Informática – Sistema IoT de monitoreo ambiental
 <script>
 const API_URL="https://air-quality-backend-66j2.onrender.com"
 
+const observer=new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){entry.target.classList.add("show")}
+})
+})
+document.querySelectorAll(".fade").forEach(el=>observer.observe(el))
+
 function updateClock(){
 document.getElementById("clock").innerText=new Date().toLocaleString()
 }
@@ -394,9 +386,20 @@ setInterval(updateClock,1000)
 updateClock()
 
 function getStatus(pm){
-if(pm<=12)return ["BUENA","#22c55e"]
-if(pm<=35)return ["MODERADA","#eab308"]
-return ["CRÍTICA","#ef4444"]
+if(pm<=12)return ["BUENA","#22c55e","La calidad del aire es óptima."]
+if(pm<=35)return ["MODERADA","#eab308","Puede afectar población sensible."]
+return ["CRÍTICA","#ef4444","Riesgo para la salud general."]
+}
+
+function animateValue(id,start,end,duration){
+let startTime=null
+function step(timestamp){
+if(!startTime)startTime=timestamp
+let progress=Math.min((timestamp-startTime)/duration,1)
+document.getElementById(id).innerText=Math.floor(progress*(end-start)+start)
+if(progress<1)requestAnimationFrame(step)
+}
+requestAnimationFrame(step)
 }
 
 async function loadData(){
@@ -409,28 +412,71 @@ document.getElementById("dot").className="dot connected"
 document.getElementById("statusText").innerText="Conectado"
 
 const latest=data[0]
-const [label,color]=getStatus(latest.pm25)
+const prev=data[1]
 
-document.getElementById("pmValue").innerText=latest.pm25
+const [label,color,info]=getStatus(latest.pm25)
+
+animateValue("pmValue",0,latest.pm25,800)
 document.getElementById("pmValue").style.color=color
 document.getElementById("pmLabel").innerText=label
+document.getElementById("pmInfo").innerText=info
+
+document.getElementById("temp").innerText=latest.temperature+" °C"
+document.getElementById("hum").innerText=latest.humidity+" %"
 
 document.getElementById("marker").style.left=Math.min((latest.pm25/60)*100,100)+"%"
 
-document.querySelectorAll(".range").forEach(r=>r.classList.remove("active"))
-if(latest.pm25<=12)document.getElementById("rangeGood").classList.add("active")
-else if(latest.pm25<=35)document.getElementById("rangeModerate").classList.add("active")
-else document.getElementById("rangeBad").classList.add("active")
+document.getElementById("estadoBox").innerText=
+`Concentración actual de ${latest.pm25} µg/m³ clasificada como ${label}.`
+
+document.getElementById("saludBox").innerText=
+label==="BUENA"?"No representa riesgo.":
+label==="MODERADA"?"Personas sensibles deben limitar exposición.":
+"Se recomienda evitar actividades al aire libre."
+
+document.getElementById("tendenciaBox").innerText=
+prev && latest.pm25>prev.pm25?"Tendencia ascendente detectada.":
+"Tendencia estable o descendente."
+
+document.getElementById("recomendacionBox").innerText=
+label==="CRÍTICA"?"Implementar medidas preventivas inmediatas.":
+"Continuar monitoreo constante."
+
+chart.data.labels=data.slice(0,20).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
+chart.data.datasets[0].data=data.slice(0,20).map(d=>d.pm25).reverse()
+chart.update()
 
 }catch{}
 }
 
+const ctx=document.getElementById("chart").getContext("2d")
+const gradient=ctx.createLinearGradient(0,0,0,400)
+gradient.addColorStop(0,"rgba(59,130,246,0.5)")
+gradient.addColorStop(1,"rgba(59,130,246,0.05)")
+
+const chart=new Chart(ctx,{
+type:"line",
+data:{labels:[],datasets:[{
+data:[],
+borderColor:"#3b82f6",
+backgroundColor:gradient,
+fill:true,
+tension:.4,
+pointRadius:3
+}]},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{legend:{display:false}},
+interaction:{mode:"index",intersect:false},
+scales:{x:{grid:{display:false}},y:{grid:{color:"rgba(255,255,255,0.05)"}}}
+}
+})
+
+function downloadExcel(){window.open(`${API_URL}/download`)}
+
 loadData()
 setInterval(loadData,5000)
-
-function downloadExcel(){
-window.open(`${API_URL}/download`)
-}
 </script>
 
 </body>
