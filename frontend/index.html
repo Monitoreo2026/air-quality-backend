@@ -23,10 +23,18 @@ body.light{
 
 body{
   margin:0;
-  font-family:Inter,Segoe UI;
+  font-family:Inter,Segoe UI,Arial;
   background:var(--bg);
   color:var(--text);
   transition:0.4s;
+}
+
+/* CONTENEDOR GENERAL */
+
+.wrapper{
+  max-width:1200px;
+  margin:auto;
+  padding:40px 20px;
 }
 
 /* HEADER */
@@ -34,18 +42,26 @@ body{
 header{
   display:flex;
   justify-content:space-between;
-  padding:18px 30px;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(8px);
   align-items:center;
+  padding-bottom:30px;
 }
 
-.status-dot{
+.brand{
+  font-weight:700;
+  font-size:20px;
+}
+
+.status{
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.dot{
   width:10px;
   height:10px;
   border-radius:50%;
-  margin-right:6px;
-  display:inline-block;
 }
 
 .connected{background:#22c55e}
@@ -57,6 +73,7 @@ button{
   border-radius:8px;
   cursor:pointer;
   font-weight:600;
+  margin-left:8px;
 }
 
 .download-btn{background:#2563eb;color:white}
@@ -66,11 +83,12 @@ button{
 
 .hero{
   text-align:center;
-  padding:50px 20px 30px;
+  margin-bottom:50px;
 }
 
 .hero h1{
-  font-size:34px;
+  font-size:36px;
+  margin-bottom:10px;
   background:linear-gradient(90deg,#3b82f6,#22c55e);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
@@ -78,11 +96,11 @@ button{
 
 .hero p{
   max-width:750px;
-  margin:15px auto;
+  margin:auto;
   color:var(--muted);
 }
 
-.live-time{
+.live-clock{
   margin-top:10px;
   font-size:14px;
   color:var(--muted);
@@ -90,35 +108,43 @@ button{
 
 /* INDICADOR PRINCIPAL */
 
-.main-indicator{
+.main-card{
+  background:var(--card);
+  padding:40px;
+  border-radius:24px;
   text-align:center;
-  margin:40px 0;
+  box-shadow:0 15px 40px rgba(0,0,0,0.35);
+  margin-bottom:50px;
 }
 
 .pm-big{
-  font-size:65px;
+  font-size:70px;
   font-weight:700;
-  transition:0.5s;
+  transition:0.4s;
 }
 
 .pm-status{
-  font-size:20px;
-  font-weight:600;
-  margin-top:5px;
+  font-size:22px;
+  margin-top:10px;
 }
 
 .recommendation{
+  font-size:15px;
   margin-top:10px;
-  font-size:14px;
   color:var(--muted);
 }
 
-.dynamic-bar{
+/* BARRA DINÁMICA */
+
+.bar-container{
   max-width:600px;
+  margin:25px auto 0;
+}
+
+.bar{
   height:14px;
   border-radius:10px;
   background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);
-  margin:20px auto;
   position:relative;
 }
 
@@ -130,150 +156,159 @@ button{
   position:absolute;
   top:-2px;
   transform:translateX(-50%);
-  transition:0.5s;
+  transition:0.4s;
 }
 
-/* CARDS */
+/* GRID METRICAS */
 
-.container{max-width:1100px;margin:auto;padding:20px}
-
-.cards{
+.metrics{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
   gap:25px;
-  margin:40px 0;
+  margin-bottom:50px;
 }
 
-.card{
+.metric-card{
   background:var(--card);
-  padding:25px;
-  border-radius:18px;
-  transition:0.3s;
-  box-shadow:0 8px 25px rgba(0,0,0,0.25);
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
 }
 
-.card:hover{transform:translateY(-6px)}
+.metric-card h3{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:10px;
+}
 
-.trend{font-size:14px;color:var(--muted)}
+.metric-card h2{
+  font-size:32px;
+}
 
 /* ANALISIS */
 
 .analysis{
   background:var(--card);
-  padding:25px;
-  border-radius:18px;
-  margin-bottom:40px;
+  padding:30px;
+  border-radius:20px;
+  margin-bottom:50px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
 }
 
-/* CHART */
+/* GRAFICA */
 
-.chart-container{
+.chart-card{
   background:var(--card);
-  padding:25px;
-  border-radius:18px;
-  height:400px;
+  padding:30px;
+  border-radius:20px;
+  height:450px;
   margin-bottom:60px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
 }
 
 /* INFO */
 
 .info-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
   gap:25px;
 }
 
 .info-card{
   background:var(--card);
   padding:25px;
-  border-radius:18px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.25);
+  border-radius:20px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
 }
 
 /* FOOTER */
 
 footer{
   margin-top:80px;
-  padding:30px;
   text-align:center;
   color:var(--muted);
-  border-top:1px solid rgba(255,255,255,0.1);
+  font-size:14px;
+  padding-bottom:30px;
+}
+
+@media(max-width:768px){
+  .pm-big{font-size:50px}
 }
 </style>
 </head>
 
 <body>
 
+<div class="wrapper">
+
 <header>
-<div>
-<span id="connectionStatus">
-<span class="status-dot disconnected"></span>Sin conexión
-</span>
+<div class="brand">🌫 Sistema Inteligente de Calidad del Aire</div>
+<div style="display:flex;align-items:center;">
+<div class="status">
+<div id="dot" class="dot disconnected"></div>
+<span id="statusText">Sin conexión</span>
 </div>
-<div>
-<button class="download-btn" onclick="downloadExcel()">Descargar Excel</button>
+<button class="download-btn" onclick="downloadExcel()">Excel</button>
 <button class="theme-btn" onclick="toggleTheme()">Modo</button>
 </div>
 </header>
 
 <section class="hero">
-<h1>Sistema Inteligente de Monitoreo de Calidad del Aire</h1>
-<p>Plataforma IoT para la medición, análisis y visualización en tiempo real de partículas PM2.5 con enfoque en salud pública y análisis ambiental.</p>
-<div class="live-time" id="liveClock"></div>
+<h1>Monitoreo Inteligente de PM2.5</h1>
+<p>Plataforma IoT para visualización, análisis y evaluación de riesgos ambientales en tiempo real.</p>
+<div class="live-clock" id="clock"></div>
 </section>
 
-<div class="main-indicator">
+<div class="main-card">
 <div class="pm-big" id="pmBig">--</div>
 <div class="pm-status" id="pmStatus">Cargando...</div>
 <div class="recommendation" id="recommendation"></div>
-<div class="dynamic-bar">
+
+<div class="bar-container">
+<div class="bar">
 <div class="marker" id="marker"></div>
 </div>
 </div>
+</div>
 
-<div class="container">
-
-<div class="cards">
-<div class="card">
+<div class="metrics">
+<div class="metric-card">
 <h3>Temperatura</h3>
 <h2 id="temp">--</h2>
-<div id="tempTrend" class="trend"></div>
 </div>
-<div class="card">
+<div class="metric-card">
 <h3>Humedad</h3>
 <h2 id="hum">--</h2>
-<div id="humTrend" class="trend"></div>
 </div>
 </div>
 
 <div class="analysis">
-<h3>Análisis Inteligente del Sistema</h3>
+<h3>Análisis Inteligente</h3>
 <p id="analysisText">Procesando datos...</p>
 </div>
 
-<div class="chart-container">
+<div class="chart-card">
 <canvas id="chart"></canvas>
 </div>
 
 <div class="info-grid">
 <div class="info-card">
 <h3>Definición Técnica</h3>
-<p>El PM2.5 corresponde a partículas con diámetro ≤2.5µm capaces de penetrar profundamente en el sistema respiratorio.</p>
+<p>PM2.5 son partículas finas ≤2.5µm que penetran profundamente en el sistema respiratorio.</p>
 </div>
 <div class="info-card">
 <h3>Impacto en Salud</h3>
-<p>Asociado con enfermedades respiratorias, cardiovasculares y riesgo elevado en poblaciones vulnerables.</p>
+<p>Asociado con enfermedades respiratorias y cardiovasculares, especialmente en población vulnerable.</p>
 </div>
 <div class="info-card">
 <h3>Normativa OMS</h3>
-<p>La OMS recomienda mantener concentraciones anuales inferiores a 5 µg/m³.</p>
+<p>La OMS recomienda mantener niveles anuales por debajo de 5 µg/m³.</p>
 </div>
 <div class="info-card">
 <h3>Aplicación IoT</h3>
-<p>El uso de sensores inteligentes permite monitoreo continuo y análisis predictivo en tiempo real.</p>
+<p>El monitoreo continuo mediante sensores permite análisis predictivo y toma de decisiones informada.</p>
 </div>
-</div>
-
 </div>
 
 <footer>
@@ -282,19 +317,20 @@ Plataforma desarrollada por<br>
 Proyecto de Ingeniería Informática – 2026
 </footer>
 
+</div>
+
 <script>
 const API_URL="https://air-quality-backend-66j2.onrender.com"
 
 function updateClock(){
-document.getElementById("liveClock").innerText=
-"Fecha y hora actual: "+new Date().toLocaleString()
+document.getElementById("clock").innerText="Fecha y hora actual: "+new Date().toLocaleString()
 }
 setInterval(updateClock,1000)
 updateClock()
 
 function getStatus(pm){
-if(pm<=12)return ["BUENA","#22c55e","Calidad óptima. Actividades al aire libre seguras."]
-if(pm<=35)return ["MODERADA","#eab308","Se recomienda precaución en personas sensibles."]
+if(pm<=12)return ["BUENA","#22c55e","Condiciones óptimas."]
+if(pm<=35)return ["MODERADA","#eab308","Precaución en población sensible."]
 return ["CRÍTICA","#ef4444","Evitar actividad física al aire libre."]
 }
 
@@ -304,8 +340,8 @@ const res=await fetch(`${API_URL}/data`)
 const data=await res.json()
 if(!data.length)return
 
-document.getElementById("connectionStatus").innerHTML=
-'<span class="status-dot connected"></span>Conectado'
+document.getElementById("dot").className="dot connected"
+document.getElementById("statusText").innerText="Conectado"
 
 const latest=data[0]
 const [status,color,reco]=getStatus(latest.pm25)
@@ -319,29 +355,49 @@ document.getElementById("temp").innerText=latest.temperature+" °C"
 document.getElementById("hum").innerText=latest.humidity+" %"
 
 document.getElementById("analysisText").innerText=
-`La concentración actual es ${latest.pm25} µg/m³, clasificándose como ${status}. Se observa un comportamiento ${data[0].pm25>data[1]?.pm25?"ascendente":"estable o descendente"} en comparación con la medición anterior.`
+`La concentración actual es ${latest.pm25} µg/m³ (${status}). Tendencia ${data[1] && latest.pm25>data[1].pm25?"ascendente":"estable o descendente"} respecto a la medición anterior.`
 
-document.getElementById("marker").style.left=
-Math.min((latest.pm25/60)*100,100)+"%"
+document.getElementById("marker").style.left=Math.min((latest.pm25/60)*100,100)+"%"
 
-chart.data.labels=data.slice(0,15).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
-chart.data.datasets[0].data=data.slice(0,15).map(d=>d.pm25).reverse()
+chart.data.labels=data.slice(0,20).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
+chart.data.datasets[0].data=data.slice(0,20).map(d=>d.pm25).reverse()
 chart.update()
 
 }catch{}
 }
 
 const ctx=document.getElementById("chart").getContext("2d")
+const gradient=ctx.createLinearGradient(0,0,0,400)
+gradient.addColorStop(0,"rgba(59,130,246,0.4)")
+gradient.addColorStop(1,"rgba(59,130,246,0.05)")
+
 const chart=new Chart(ctx,{
 type:"line",
 data:{labels:[],datasets:[{
 data:[],
 borderColor:"#3b82f6",
-backgroundColor:"rgba(59,130,246,0.2)",
+backgroundColor:gradient,
 fill:true,
-tension:0.4
+tension:0.45,
+pointRadius:3
 }]},
-options:{responsive:true,maintainAspectRatio:false}
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{
+legend:{display:false},
+tooltip:{
+backgroundColor:"#1e293b",
+titleColor:"#fff",
+bodyColor:"#fff",
+padding:10
+}
+},
+scales:{
+x:{grid:{display:false}},
+y:{grid:{color:"rgba(255,255,255,0.05)"}}
+}
+}
 })
 
 function downloadExcel(){window.open(`${API_URL}/download`)}
