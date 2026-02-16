@@ -12,7 +12,7 @@
   --card:#1e293b;
   --text:#f1f5f9;
   --muted:#94a3b8;
-  --glass:rgba(255,255,255,0.05);
+  --accent:#3b82f6;
 }
 
 body.light{
@@ -20,14 +20,12 @@ body.light{
   --card:#ffffff;
   --text:#0f172a;
   --muted:#475569;
-  --glass:rgba(0,0,0,0.04);
 }
 
 *{box-sizing:border-box}
-
 body{
   margin:0;
-  font-family:Inter,Segoe UI,Arial;
+  font-family:Inter,Segoe UI;
   background:var(--bg);
   color:var(--text);
   transition:0.3s;
@@ -40,33 +38,11 @@ header{
   justify-content:space-between;
   align-items:center;
   padding:18px 30px;
-  background:var(--glass);
-  backdrop-filter:blur(10px);
-  position:sticky;
-  top:0;
-  z-index:100;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(8px);
 }
 
-.logo{
-  font-weight:700;
-  font-size:20px;
-}
-
-.connection{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:14px;
-}
-
-.dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-}
-
-.connected{background:#22c55e;}
-.disconnected{background:#ef4444;}
+.logo{font-weight:700;font-size:18px}
 
 button{
   border:none;
@@ -76,149 +52,131 @@ button{
   font-weight:600;
 }
 
-.download-btn{background:#2563eb;color:white;}
-.theme-btn{background:#64748b;color:white;}
+.download-btn{background:#2563eb;color:white}
+.theme-btn{background:#64748b;color:white}
 
 /* HERO */
 
-.hero{
-  text-align:center;
-  padding:50px 20px 20px;
-}
-
+.hero{text-align:center;padding:50px 20px}
 .hero h1{
   font-size:34px;
-  margin:0;
   background:linear-gradient(90deg,#3b82f6,#22c55e);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
 }
+.hero p{color:var(--muted);max-width:700px;margin:auto}
 
-.hero p{
-  max-width:700px;
-  margin:15px auto;
-  color:var(--muted);
-}
+/* CARDS */
 
-/* ESTADO GENERAL */
-
-.main-status{
-  text-align:center;
-  margin:30px 0 15px;
-}
-
-.badge{
-  display:inline-block;
-  padding:10px 22px;
-  border-radius:25px;
-  font-weight:700;
-  font-size:18px;
-  color:white;
-}
-
-.update-time{
-  margin-top:8px;
-  font-size:13px;
-  color:var(--muted);
-}
-
-/* BARRA RANGOS */
-
-.risk-bar{
-  display:flex;
-  max-width:600px;
-  margin:15px auto;
-  height:14px;
-  border-radius:10px;
-  overflow:hidden;
-}
-
-.risk-bar div{flex:1;}
-.good-zone{background:#22c55e;}
-.medium-zone{background:#eab308;}
-.bad-zone{background:#ef4444;}
-
-.range-labels{
-  text-align:center;
-  font-size:13px;
-  color:var(--muted);
-}
-
-/* DASHBOARD */
-
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
-}
-
+.container{max-width:1200px;margin:auto;padding:20px}
 .cards{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
   gap:25px;
-  margin-bottom:40px;
+  margin:40px 0;
 }
 
 .card{
   background:var(--card);
   padding:25px;
   border-radius:18px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.25);
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
   transition:0.3s;
 }
+.card:hover{transform:translateY(-6px)}
 
-.card:hover{
-  transform:translateY(-5px);
-}
-
-.card h3{
-  margin:0;
-  font-size:14px;
-  color:var(--muted);
+.card-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
 }
 
 .card h2{
+  font-size:32px;
   margin:10px 0;
-  font-size:30px;
+  transition:0.3s;
 }
 
 .trend{
   font-size:14px;
-  color:var(--muted);
+  font-weight:600;
+  transition:0.3s;
 }
 
-/* GRÁFICA */
+/* SVG ICONS */
+.icon{
+  width:24px;
+  height:24px;
+  stroke:var(--accent);
+  stroke-width:2;
+  fill:none;
+}
+
+/* CHART */
 
 .chart-container{
   background:var(--card);
   padding:25px;
   border-radius:18px;
-  margin-bottom:50px;
+  margin-bottom:60px;
 }
 
-canvas{
-  height:400px !important;
-}
-
-/* INFO */
+/* INFO SECTION PROFESIONAL */
 
 .info-section{
+  margin-top:60px;
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:25px;
+}
+
+.info-card{
   background:var(--card);
-  padding:30px;
+  padding:25px;
   border-radius:18px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.25);
+  transition:0.3s;
+}
+.info-card:hover{transform:translateY(-5px)}
+
+.info-card h3{
+  margin-top:10px;
+  font-size:18px;
+}
+
+.info-card p, .info-card ul{
+  color:var(--muted);
+  font-size:14px;
   line-height:1.6;
 }
 
-.info-section h3{
-  margin-top:0;
+.info-card ul{
+  padding-left:18px;
+}
+
+/* FOOTER */
+
+footer{
+  margin-top:80px;
+  padding:30px;
+  text-align:center;
+  font-size:14px;
+  color:var(--muted);
+  border-top:1px solid rgba(255,255,255,0.1);
+}
+
+footer strong{
+  color:var(--text);
 }
 
 /* RESPONSIVE */
 
 @media(max-width:768px){
-  header{flex-direction:column;gap:12px;}
-  .hero h1{font-size:26px;}
-  canvas{height:300px !important;}
+  .hero h1{font-size:26px}
 }
 </style>
 </head>
@@ -227,59 +185,48 @@ canvas{
 
 <header>
   <div class="logo">🌫 Sistema Inteligente de Calidad del Aire</div>
-  <div style="display:flex;gap:15px;align-items:center;">
-    <div class="connection">
-      <div id="dot" class="dot disconnected"></div>
-      <span id="connText">Sin conexión</span>
-    </div>
+  <div>
     <button class="download-btn" onclick="downloadExcel()">Descargar Excel</button>
     <button class="theme-btn" onclick="toggleTheme()">Modo</button>
   </div>
 </header>
 
 <section class="hero">
-  <h1>Monitoreo en Tiempo Real de PM2.5</h1>
-  <p>
-    Plataforma de visualización ambiental que permite analizar la calidad del aire,
-    identificar riesgos y comprender el impacto de las partículas PM2.5 en la salud.
-  </p>
+  <h1>Monitoreo Inteligente de PM2.5</h1>
+  <p>Visualización avanzada para análisis ambiental y evaluación de riesgos en tiempo real.</p>
 </section>
-
-<div class="main-status">
-  <div id="badge" class="badge">--</div>
-  <div class="update-time" id="lastUpdate">Actualizando...</div>
-
-  <div class="risk-bar">
-    <div class="good-zone"></div>
-    <div class="medium-zone"></div>
-    <div class="bad-zone"></div>
-  </div>
-
-  <div class="range-labels">
-    0–12 Buena | 13–35 Moderada | 36+ Crítica
-  </div>
-</div>
 
 <div class="container">
 
 <div class="cards">
+
   <div class="card">
-    <h3>🌡 Temperatura</h3>
-    <h2 id="temp">-- °C</h2>
+    <div class="card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 3v18M5 12h14"/></svg>
+      <h4>Temperatura</h4>
+    </div>
+    <h2 id="temp">--</h2>
     <div id="tempTrend" class="trend"></div>
   </div>
 
   <div class="card">
-    <h3>💧 Humedad</h3>
-    <h2 id="hum">-- %</h2>
+    <div class="card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M8 6c0-2 8-2 8 0"/></svg>
+      <h4>Humedad</h4>
+    </div>
+    <h2 id="hum">--</h2>
     <div id="humTrend" class="trend"></div>
   </div>
 
   <div class="card">
-    <h3>🌫 PM2.5</h3>
+    <div class="card-header">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
+      <h4>PM2.5</h4>
+    </div>
     <h2 id="pm">--</h2>
     <div id="pmTrend" class="trend"></div>
   </div>
+
 </div>
 
 <div class="chart-container">
@@ -287,72 +234,60 @@ canvas{
 </div>
 
 <div class="info-section">
-  <h3>¿Qué es el PM2.5?</h3>
-  <p>
-    El PM2.5 son partículas microscópicas suspendidas en el aire con un diámetro menor a 2.5 micrómetros.
-    Debido a su tamaño, pueden penetrar profundamente en los pulmones y afectar la salud respiratoria y cardiovascular.
-  </p>
+  <div class="info-grid">
 
-  <h3>Factores que empeoran la calidad del aire</h3>
-  <ul>
-    <li>Tráfico vehicular intenso</li>
-    <li>Quema de residuos o incendios</li>
-    <li>Emisiones industriales</li>
-  </ul>
+    <div class="info-card">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>
+      <h3>¿Qué es el PM2.5?</h3>
+      <p>Partículas microscópicas menores a 2.5µm que penetran profundamente en los pulmones y afectan la salud respiratoria.</p>
+    </div>
 
-  <h3>Factores que la mejoran</h3>
-  <ul>
-    <li>Lluvias</li>
-    <li>Reducción del tráfico</li>
-    <li>Presencia de vegetación</li>
-  </ul>
+    <div class="info-card">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 12h18"/></svg>
+      <h3>Factores que empeoran</h3>
+      <ul>
+        <li>Tráfico vehicular</li>
+        <li>Emisiones industriales</li>
+        <li>Incendios y quema</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20"/></svg>
+      <h3>Factores que mejoran</h3>
+      <ul>
+        <li>Lluvias</li>
+        <li>Reducción del tráfico</li>
+        <li>Zonas verdes</li>
+      </ul>
+    </div>
+
+  </div>
 </div>
 
 </div>
+
+<footer>
+  Plataforma desarrollada por<br>
+  <strong>Santiago Rubio & Jheferson Imbachi</strong><br>
+  Proyecto Académico – Ingeniería Informática
+</footer>
 
 <script>
 const API_URL="https://air-quality-backend-66j2.onrender.com"
 let previous={}
 
-const ctx=document.getElementById("chart").getContext("2d")
-
-const gradient=ctx.createLinearGradient(0,0,0,400)
-gradient.addColorStop(0,"rgba(59,130,246,0.6)")
-gradient.addColorStop(1,"rgba(59,130,246,0.05)")
-
-const chart=new Chart(ctx,{
- type:"line",
- data:{labels:[],datasets:[{
-  label:"PM2.5 (µg/m³)",
-  data:[],
-  fill:true,
-  backgroundColor:gradient,
-  borderColor:"#3b82f6",
-  tension:0.4,
-  pointRadius:4
- }]},
- options:{
-  responsive:true,
-  maintainAspectRatio:false,
-  scales:{
-   x:{display:false}
-  },
-  interaction:{mode:"index",intersect:false},
-  plugins:{
-   tooltip:{
-    callbacks:{
-     label:(c)=>`PM2.5: ${c.parsed.y} µg/m³`,
-     title:(c)=>c[0].label
-    }
-   }
+function animateValue(id,start,end,duration,suffix=""){
+  let range=end-start
+  let startTime=null
+  function step(timestamp){
+    if(!startTime)startTime=timestamp
+    let progress=Math.min((timestamp-startTime)/duration,1)
+    document.getElementById(id).innerText=
+      (start+range*progress).toFixed(1)+suffix
+    if(progress<1)requestAnimationFrame(step)
   }
- }
-})
-
-function getStatus(pm){
- if(pm<=12)return {text:"Calidad del Aire: BUENA",color:"#22c55e"}
- if(pm<=35)return {text:"Calidad del Aire: MODERADA",color:"#eab308"}
- return {text:"Calidad del Aire: CRÍTICA",color:"#ef4444"}
+  requestAnimationFrame(step)
 }
 
 async function loadData(){
@@ -361,39 +296,15 @@ async function loadData(){
   const data=await res.json()
   if(!data.length)return
 
-  document.getElementById("dot").className="dot connected"
-  document.getElementById("connText").innerText="Conectado"
-
   const latest=data[0]
 
-  document.getElementById("temp").innerText=latest.temperature+" °C"
-  document.getElementById("hum").innerText=latest.humidity+" %"
-  document.getElementById("pm").innerText=latest.pm25
+  animateValue("temp",previous.temp||0,latest.temperature,800," °C")
+  animateValue("hum",previous.hum||0,latest.humidity,800," %")
+  animateValue("pm",previous.pm||0,latest.pm25,800)
 
-  const status=getStatus(latest.pm25)
-  const badge=document.getElementById("badge")
-  badge.innerText=status.text
-  badge.style.background=status.color
+  previous={temp:latest.temperature,hum:latest.humidity,pm:latest.pm25}
 
-  document.getElementById("lastUpdate").innerText=
-   "Última actualización: "+new Date(latest.created_at).toLocaleString()
-
-  if(previous.pm!=null){
-   document.getElementById("pmTrend").innerText=latest.pm25>previous.pm?"⬆ Empeorando":"⬇ Mejorando"
-   document.getElementById("tempTrend").innerText=latest.temperature>previous.temp?"⬆ Subiendo":"⬇ Bajando"
-   document.getElementById("humTrend").innerText=latest.humidity>previous.hum?"⬆ Aumentando":"⬇ Disminuyendo"
-  }
-
-  previous={pm:latest.pm25,temp:latest.temperature,hum:latest.humidity}
-
-  chart.data.labels=data.slice(0,15).map(d=>new Date(d.created_at).toLocaleString()).reverse()
-  chart.data.datasets[0].data=data.slice(0,15).map(d=>d.pm25).reverse()
-  chart.update()
-
- }catch{
-  document.getElementById("dot").className="dot disconnected"
-  document.getElementById("connText").innerText="Sin conexión"
- }
+ }catch{}
 }
 
 function downloadExcel(){window.open(`${API_URL}/download`)}
