@@ -12,6 +12,7 @@
   --card:#1e293b;
   --text:#ffffff;
   --header:#1e293b;
+  --primary:#3b82f6;
 }
 
 body.light{
@@ -29,9 +30,11 @@ body{
   transition:0.3s ease;
 }
 
+/* HEADER */
+
 header{
   background:var(--header);
-  padding:20px;
+  padding:22px;
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -44,7 +47,7 @@ header{
   align-items:center;
   gap:12px;
   font-weight:600;
-  font-size:18px;
+  font-size:20px;
 }
 
 .status-indicator{
@@ -53,16 +56,26 @@ header{
   gap:6px;
 }
 
-.dot{width:10px;height:10px;border-radius:50%;}
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+}
+
 .connected{background:#16a34a;}
 .disconnected{background:#dc2626;}
 
 button{
-  padding:8px 14px;
+  padding:9px 16px;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   cursor:pointer;
   font-weight:600;
+  transition:0.2s;
+}
+
+button:hover{
+  transform:scale(1.05);
 }
 
 .download-btn{background:#2563eb;color:white;}
@@ -73,39 +86,66 @@ button{
   background:#dc2626;
   color:white;
   text-align:center;
-  padding:10px;
+  padding:12px;
   font-weight:700;
   animation:blink 1s infinite;
 }
 
 @keyframes blink{
-  50%{opacity:0.5;}
+  50%{opacity:0.6;}
 }
 
 .container{
-  padding:30px 20px;
-  max-width:1100px;
+  padding:40px 25px;
+  max-width:1200px;
   margin:auto;
 }
 
+/* CARDS */
+
 .cards{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:20px;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:25px;
+  margin-bottom:40px;
 }
 
 .card{
-  background:var(--card);
-  padding:22px;
-  border-radius:16px;
+  padding:28px;
+  border-radius:20px;
   text-align:center;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+  box-shadow:0 8px 25px rgba(0,0,0,0.25);
+  transition:0.3s;
+  color:white;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+.temp-card{
+  background:linear-gradient(135deg,#f97316,#ea580c);
+}
+
+.hum-card{
+  background:linear-gradient(135deg,#0ea5e9,#0369a1);
+}
+
+.pm-card{
+  background:var(--card);
+  color:var(--text);
+}
+
+.card h2{
+  margin:12px 0 0 0;
+  font-size:32px;
+  font-weight:700;
 }
 
 .status{
-  margin-top:10px;
-  padding:6px;
-  border-radius:8px;
+  margin-top:12px;
+  padding:8px;
+  border-radius:10px;
   font-weight:700;
 }
 
@@ -114,61 +154,31 @@ button{
 .bad{background:#dc2626;}
 
 .trend{
-  margin-top:6px;
+  margin-top:8px;
   font-size:14px;
+  opacity:0.9;
+}
+
+/* GRAPH */
+
+.chart-container{
+  background:var(--card);
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.25);
 }
 
 canvas{
-  margin-top:35px;
-  background:var(--card);
-  border-radius:16px;
-  padding:15px;
-  height:320px !important;
+  height:420px !important;
 }
 
-/* EDUCATIONAL SECTION */
-
-.info-section{
-  margin-top:40px;
-  background:var(--card);
-  padding:25px;
-  border-radius:16px;
-  line-height:1.6;
-}
-
-.info-section h3{
-  margin-top:0;
-}
-
-.range-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:15px;
-}
-
-.range-table th,
-.range-table td{
-  padding:10px;
-  text-align:center;
-  border:1px solid rgba(255,255,255,0.1);
-}
-
-.range-good{background:#16a34a;}
-.range-medium{background:#eab308;color:black;}
-.range-bad{background:#dc2626;}
+/* RESPONSIVE */
 
 @media (max-width:768px){
+
   header{
     flex-direction:column;
-    align-items:center;
     text-align:center;
-  }
-
-  header > div:last-child{
-    width:100%;
-    display:flex;
-    justify-content:center;
-    gap:10px;
   }
 
   .cards{
@@ -176,7 +186,7 @@ canvas{
   }
 
   canvas{
-    height:250px !important;
+    height:320px !important;
   }
 }
 </style>
@@ -186,7 +196,7 @@ canvas{
 
 <header>
   <div class="header-left">
-    🌫 Sistema de Monitoreo Ambiental
+    🌫 Monitoreo Inteligente PM2.5
     <div class="status-indicator">
       <div id="connectionDot" class="dot disconnected"></div>
       <span id="connectionText">Sin conexión</span>
@@ -206,74 +216,26 @@ canvas{
 <div class="container">
 
 <div class="cards">
-  <div class="card">
-    <div>Temperatura</div>
+  <div class="card temp-card">
+    🌡 Temperatura
     <h2 id="temp">-- °C</h2>
   </div>
 
-  <div class="card">
-    <div>Humedad</div>
+  <div class="card hum-card">
+    💧 Humedad
     <h2 id="hum">-- %</h2>
   </div>
 
-  <div class="card">
-    <div>PM2.5 (µg/m³)</div>
+  <div class="card pm-card">
+    🌫 PM2.5
     <h2 id="pm25">--</h2>
     <div id="status" class="status">--</div>
     <div id="trend" class="trend"></div>
   </div>
 </div>
 
-<canvas id="airChart"></canvas>
-
-<!-- EDUCATIONAL SECTION -->
-<div class="info-section">
-  <h3>¿Qué es el PM2.5?</h3>
-  <p>
-    El PM2.5 es material particulado con un diámetro menor a 2.5 micrómetros.
-    Estas partículas son tan pequeñas que pueden ingresar profundamente en los pulmones
-    y afectar el sistema respiratorio y cardiovascular.
-  </p>
-
-  <h3>Rangos de Calidad del Aire (PM2.5)</h3>
-  <table class="range-table">
-    <tr>
-      <th>Rango (µg/m³)</th>
-      <th>Estado</th>
-      <th>Impacto</th>
-    </tr>
-    <tr class="range-good">
-      <td>0 – 12</td>
-      <td>Bueno</td>
-      <td>Calidad del aire satisfactoria</td>
-    </tr>
-    <tr class="range-medium">
-      <td>13 – 35</td>
-      <td>Moderado</td>
-      <td>Personas sensibles pueden presentar molestias</td>
-    </tr>
-    <tr class="range-bad">
-      <td>36+</td>
-      <td>Crítico</td>
-      <td>Riesgo para la salud general</td>
-    </tr>
-  </table>
-
-  <h3>¿Qué empeora la calidad del aire?</h3>
-  <ul>
-    <li>Tráfico vehicular</li>
-    <li>Industria y fábricas</li>
-    <li>Quema de residuos</li>
-    <li>Incendios forestales</li>
-  </ul>
-
-  <h3>¿Qué la mejora?</h3>
-  <ul>
-    <li>Reducción de emisiones</li>
-    <li>Uso de transporte sostenible</li>
-    <li>Mayor vegetación y zonas verdes</li>
-    <li>Lluvia y condiciones climáticas favorables</li>
-  </ul>
+<div class="chart-container">
+  <canvas id="airChart"></canvas>
 </div>
 
 </div>
@@ -287,21 +249,30 @@ let lastStatus = ""
 const ctx = document.getElementById('airChart').getContext('2d')
 const chart = new Chart(ctx,{
   type:'line',
-  data:{labels:[],datasets:[{
-    label:'Concentración PM2.5 (µg/m³)',
-    data:[],
-    borderWidth:3,
-    tension:0.4,
-    pointRadius:5
-  }]},
+  data:{
+    labels:[],
+    datasets:[{
+      label:'Concentración de PM2.5 (µg/m³)',
+      data:[],
+      borderWidth:3,
+      tension:0.4,
+      pointRadius:5,
+      pointHoverRadius:8
+    }]
+  },
   options:{
     responsive:true,
     maintainAspectRatio:false,
     plugins:{
+      legend:{
+        labels:{
+          font:{size:14}
+        }
+      },
       tooltip:{
         callbacks:{
           label:function(context){
-            return "PM2.5: "+context.raw+" µg/m³"
+            return `PM2.5: ${context.parsed.y} µg/m³`
           },
           title:function(context){
             return context[0].label
@@ -310,7 +281,19 @@ const chart = new Chart(ctx,{
       }
     },
     scales:{
-      y:{beginAtZero:true}
+      x:{
+        ticks:{
+          maxRotation:45,
+          minRotation:30
+        }
+      },
+      y:{
+        beginAtZero:true,
+        title:{
+          display:true,
+          text:'µg/m³'
+        }
+      }
     }
   }
 })
@@ -353,11 +336,13 @@ async function loadData(){
     previousPM = latest.pm25
     lastStatus = statusInfo.text
 
-    chart.data.labels = data.slice(0,10).map(d=>
-      new Date(d.created_at).toLocaleString('es-CO',{timeZone:'America/Bogota'})
+    chart.data.labels = data.slice(0,12).map(d=>
+      new Date(d.created_at).toLocaleString()
     ).reverse()
 
-    chart.data.datasets[0].data = data.slice(0,10).map(d=>d.pm25).reverse()
+    chart.data.datasets[0].data =
+      data.slice(0,12).map(d=>d.pm25).reverse()
+
     chart.data.datasets[0].borderColor = statusInfo.color
     chart.update()
 
