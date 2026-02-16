@@ -29,13 +29,27 @@ body{
   transition:0.4s;
 }
 
+/* HEADER */
+
 header{
   display:flex;
   justify-content:space-between;
   padding:18px 30px;
   background:rgba(255,255,255,0.05);
   backdrop-filter:blur(8px);
+  align-items:center;
 }
+
+.status-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-right:6px;
+  display:inline-block;
+}
+
+.connected{background:#22c55e}
+.disconnected{background:#ef4444}
 
 button{
   border:none;
@@ -48,13 +62,30 @@ button{
 .download-btn{background:#2563eb;color:white}
 .theme-btn{background:#64748b;color:white}
 
-.hero{text-align:center;padding:40px 20px}
+/* HERO */
+
+.hero{
+  text-align:center;
+  padding:50px 20px 30px;
+}
 
 .hero h1{
   font-size:34px;
   background:linear-gradient(90deg,#3b82f6,#22c55e);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
+}
+
+.hero p{
+  max-width:750px;
+  margin:15px auto;
+  color:var(--muted);
+}
+
+.live-time{
+  margin-top:10px;
+  font-size:14px;
+  color:var(--muted);
 }
 
 /* INDICADOR PRINCIPAL */
@@ -64,8 +95,8 @@ button{
   margin:40px 0;
 }
 
-.pm-value{
-  font-size:60px;
+.pm-big{
+  font-size:65px;
   font-weight:700;
   transition:0.5s;
 }
@@ -73,6 +104,13 @@ button{
 .pm-status{
   font-size:20px;
   font-weight:600;
+  margin-top:5px;
+}
+
+.recommendation{
+  margin-top:10px;
+  font-size:14px;
+  color:var(--muted);
 }
 
 .dynamic-bar{
@@ -111,9 +149,21 @@ button{
   padding:25px;
   border-radius:18px;
   transition:0.3s;
+  box-shadow:0 8px 25px rgba(0,0,0,0.25);
 }
 
 .card:hover{transform:translateY(-6px)}
+
+.trend{font-size:14px;color:var(--muted)}
+
+/* ANALISIS */
+
+.analysis{
+  background:var(--card);
+  padding:25px;
+  border-radius:18px;
+  margin-bottom:40px;
+}
 
 /* CHART */
 
@@ -137,6 +187,7 @@ button{
   background:var(--card);
   padding:25px;
   border-radius:18px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.25);
 }
 
 /* FOOTER */
@@ -154,7 +205,11 @@ footer{
 <body>
 
 <header>
-<div><strong>🌫 Sistema Inteligente de Calidad del Aire</strong></div>
+<div>
+<span id="connectionStatus">
+<span class="status-dot disconnected"></span>Sin conexión
+</span>
+</div>
 <div>
 <button class="download-btn" onclick="downloadExcel()">Descargar Excel</button>
 <button class="theme-btn" onclick="toggleTheme()">Modo</button>
@@ -162,12 +217,15 @@ footer{
 </header>
 
 <section class="hero">
-<h1>Monitoreo Avanzado de PM2.5</h1>
+<h1>Sistema Inteligente de Monitoreo de Calidad del Aire</h1>
+<p>Plataforma IoT para la medición, análisis y visualización en tiempo real de partículas PM2.5 con enfoque en salud pública y análisis ambiental.</p>
+<div class="live-time" id="liveClock"></div>
 </section>
 
 <div class="main-indicator">
-<div class="pm-value" id="pmBig">--</div>
+<div class="pm-big" id="pmBig">--</div>
 <div class="pm-status" id="pmStatus">Cargando...</div>
+<div class="recommendation" id="recommendation"></div>
 <div class="dynamic-bar">
 <div class="marker" id="marker"></div>
 </div>
@@ -179,11 +237,18 @@ footer{
 <div class="card">
 <h3>Temperatura</h3>
 <h2 id="temp">--</h2>
+<div id="tempTrend" class="trend"></div>
 </div>
 <div class="card">
 <h3>Humedad</h3>
 <h2 id="hum">--</h2>
+<div id="humTrend" class="trend"></div>
 </div>
+</div>
+
+<div class="analysis">
+<h3>Análisis Inteligente del Sistema</h3>
+<p id="analysisText">Procesando datos...</p>
 </div>
 
 <div class="chart-container">
@@ -192,16 +257,20 @@ footer{
 
 <div class="info-grid">
 <div class="info-card">
-<h3>Impacto en la salud</h3>
-<p>El PM2.5 puede generar enfermedades respiratorias y cardiovasculares.</p>
+<h3>Definición Técnica</h3>
+<p>El PM2.5 corresponde a partículas con diámetro ≤2.5µm capaces de penetrar profundamente en el sistema respiratorio.</p>
 </div>
 <div class="info-card">
-<h3>Fuentes principales</h3>
-<p>Transporte, industrias, combustión de biomasa.</p>
+<h3>Impacto en Salud</h3>
+<p>Asociado con enfermedades respiratorias, cardiovasculares y riesgo elevado en poblaciones vulnerables.</p>
 </div>
 <div class="info-card">
-<h3>Prevención</h3>
-<p>Reducción de emisiones y monitoreo continuo.</p>
+<h3>Normativa OMS</h3>
+<p>La OMS recomienda mantener concentraciones anuales inferiores a 5 µg/m³.</p>
+</div>
+<div class="info-card">
+<h3>Aplicación IoT</h3>
+<p>El uso de sensores inteligentes permite monitoreo continuo y análisis predictivo en tiempo real.</p>
 </div>
 </div>
 
@@ -210,11 +279,57 @@ footer{
 <footer>
 Plataforma desarrollada por<br>
 <strong>Santiago Rubio & Jheferson Imbachi</strong><br>
-© <span id="year"></span> Ingeniería Informática
+Proyecto de Ingeniería Informática – 2026
 </footer>
 
 <script>
 const API_URL="https://air-quality-backend-66j2.onrender.com"
+
+function updateClock(){
+document.getElementById("liveClock").innerText=
+"Fecha y hora actual: "+new Date().toLocaleString()
+}
+setInterval(updateClock,1000)
+updateClock()
+
+function getStatus(pm){
+if(pm<=12)return ["BUENA","#22c55e","Calidad óptima. Actividades al aire libre seguras."]
+if(pm<=35)return ["MODERADA","#eab308","Se recomienda precaución en personas sensibles."]
+return ["CRÍTICA","#ef4444","Evitar actividad física al aire libre."]
+}
+
+async function loadData(){
+try{
+const res=await fetch(`${API_URL}/data`)
+const data=await res.json()
+if(!data.length)return
+
+document.getElementById("connectionStatus").innerHTML=
+'<span class="status-dot connected"></span>Conectado'
+
+const latest=data[0]
+const [status,color,reco]=getStatus(latest.pm25)
+
+document.getElementById("pmBig").innerText=latest.pm25
+document.getElementById("pmBig").style.color=color
+document.getElementById("pmStatus").innerText="Calidad: "+status
+document.getElementById("recommendation").innerText=reco
+
+document.getElementById("temp").innerText=latest.temperature+" °C"
+document.getElementById("hum").innerText=latest.humidity+" %"
+
+document.getElementById("analysisText").innerText=
+`La concentración actual es ${latest.pm25} µg/m³, clasificándose como ${status}. Se observa un comportamiento ${data[0].pm25>data[1]?.pm25?"ascendente":"estable o descendente"} en comparación con la medición anterior.`
+
+document.getElementById("marker").style.left=
+Math.min((latest.pm25/60)*100,100)+"%"
+
+chart.data.labels=data.slice(0,15).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
+chart.data.datasets[0].data=data.slice(0,15).map(d=>d.pm25).reverse()
+chart.update()
+
+}catch{}
+}
 
 const ctx=document.getElementById("chart").getContext("2d")
 const chart=new Chart(ctx,{
@@ -229,37 +344,8 @@ tension:0.4
 options:{responsive:true,maintainAspectRatio:false}
 })
 
-function getStatus(pm){
-if(pm<=12)return ["BUENA","#22c55e"]
-if(pm<=35)return ["MODERADA","#eab308"]
-return ["CRÍTICA","#ef4444"]
-}
-
-async function loadData(){
-const res=await fetch(`${API_URL}/data`)
-const data=await res.json()
-if(!data.length)return
-const latest=data[0]
-
-document.getElementById("temp").innerText=latest.temperature+" °C"
-document.getElementById("hum").innerText=latest.humidity+" %"
-document.getElementById("pmBig").innerText=latest.pm25
-
-const [status,color]=getStatus(latest.pm25)
-document.getElementById("pmStatus").innerText=status
-document.getElementById("pmBig").style.color=color
-
-const marker=document.getElementById("marker")
-marker.style.left=Math.min((latest.pm25/60)*100,100)+"%"
-
-chart.data.labels=data.slice(0,15).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
-chart.data.datasets[0].data=data.slice(0,15).map(d=>d.pm25).reverse()
-chart.update()
-}
-
 function downloadExcel(){window.open(`${API_URL}/download`)}
 function toggleTheme(){document.body.classList.toggle("light")}
-document.getElementById("year").innerText=new Date().getFullYear()
 
 loadData()
 setInterval(loadData,5000)
