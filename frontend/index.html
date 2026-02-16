@@ -3,10 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <title>Sistema Inteligente de Calidad del Aire</title>
 
 <style>
@@ -19,16 +17,6 @@
 --border:rgba(255,255,255,0.05);
 }
 
-body.light{
---bg:#f1f5f9;
---card:#ffffff;
---card2:#f8fafc;
---text:#0f172a;
---muted:#475569;
---border:rgba(0,0,0,0.05);
-background:#f1f5f9;
-}
-
 *{box-sizing:border-box}
 
 body{
@@ -36,7 +24,6 @@ margin:0;
 font-family:'Inter',sans-serif;
 background:linear-gradient(180deg,#0b1220,#0f172a);
 color:var(--text);
-transition:.4s;
 overflow-x:hidden;
 }
 
@@ -47,20 +34,17 @@ padding:60px 20px;
 }
 
 /* Animaciones */
-
 .fade{
 opacity:0;
 transform:translateY(30px);
 transition:all .9s cubic-bezier(.16,1,.3,1);
 }
-
 .fade.show{
 opacity:1;
 transform:translateY(0);
 }
 
 /* Header */
-
 header{
 display:flex;
 justify-content:space-between;
@@ -73,6 +57,7 @@ gap:15px;
 .brand{
 font-weight:700;
 font-size:20px;
+letter-spacing:-0.5px;
 }
 
 .status{
@@ -80,7 +65,6 @@ display:flex;
 align-items:center;
 gap:10px;
 font-size:14px;
-flex-wrap:wrap;
 }
 
 .dot{
@@ -108,7 +92,6 @@ background:#2563eb;
 }
 
 /* Hero */
-
 .hero{
 text-align:center;
 margin-bottom:70px;
@@ -117,6 +100,7 @@ margin-bottom:70px;
 .hero h1{
 font-size:44px;
 font-weight:800;
+letter-spacing:-1px;
 background:linear-gradient(90deg,#3b82f6,#22c55e);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
@@ -128,8 +112,12 @@ max-width:650px;
 margin:20px auto;
 }
 
-/* Main Card */
+.clock{
+font-size:14px;
+color:var(--muted);
+}
 
+/* Main Card */
 .main-card{
 background:var(--card);
 padding:60px;
@@ -137,12 +125,24 @@ border-radius:30px;
 text-align:center;
 box-shadow:0 30px 80px rgba(0,0,0,0.5);
 margin-bottom:70px;
+position:relative;
+overflow:hidden;
 }
 
 .pm-value{
 font-size:80px;
 font-weight:800;
 transition:.5s;
+}
+
+.pm-label{
+font-size:24px;
+margin-top:10px;
+}
+
+.pm-info{
+margin-top:10px;
+color:var(--muted);
 }
 
 .bar{
@@ -166,7 +166,6 @@ transition:.5s;
 }
 
 /* Rangos */
-
 .range-labels{
 display:flex;
 justify-content:space-between;
@@ -182,8 +181,7 @@ font-weight:500;
 .range.moderate{color:#eab308}
 .range.bad{color:#ef4444}
 
-/* Metrics mejoradas */
-
+/* Metrics MEJORADAS */
 .metrics{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -192,36 +190,40 @@ margin-bottom:70px;
 }
 
 .metric{
-position:relative;
+background:linear-gradient(145deg,#0f172a,#111827);
 padding:40px;
 border-radius:25px;
+text-align:center;
 border:1px solid var(--border);
 transition:.4s;
+position:relative;
 overflow:hidden;
-background:var(--card2);
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:10px;
 }
 
-.metric svg{
-width:42px;
-height:42px;
-opacity:0.9;
+.metric::before{
+content:"";
+position:absolute;
+top:-50%;
+right:-50%;
+width:200%;
+height:200%;
+background:radial-gradient(circle,rgba(59,130,246,0.15),transparent 70%);
+transform:rotate(25deg);
 }
 
 .metric h3{
-margin:0;
+margin-bottom:10px;
 font-weight:600;
 color:var(--muted);
+position:relative;
+z-index:2;
 }
 
 .metric h2{
-font-size:34px;
-font-weight:700;
-margin:0;
+font-size:36px;
+font-weight:800;
+position:relative;
+z-index:2;
 }
 
 .metric:hover{
@@ -229,33 +231,17 @@ transform:translateY(-6px);
 box-shadow:0 20px 40px rgba(0,0,0,0.4);
 }
 
-/* Colores dinámicos */
-
-.temp-cold{background:linear-gradient(135deg,#1e3a8a,#2563eb)}
-.temp-warm{background:linear-gradient(135deg,#b45309,#f97316)}
-.temp-hot{background:linear-gradient(135deg,#7f1d1d,#ef4444)}
-
-.hum-low{background:linear-gradient(135deg,#78350f,#f59e0b)}
-.hum-mid{background:linear-gradient(135deg,#0e7490,#06b6d4)}
-.hum-high{background:linear-gradient(135deg,#1e3a8a,#3b82f6)}
-
-.metric.temp-cold,
-.metric.temp-warm,
-.metric.temp-hot,
-.metric.hum-low,
-.metric.hum-mid,
-.metric.hum-high{
-color:white;
-}
-
 /* Analysis */
-
 .analysis{
 background:var(--card);
 padding:45px;
 border-radius:30px;
 border:1px solid var(--border);
 margin-bottom:70px;
+}
+
+.analysis h3{
+margin-bottom:20px;
 }
 
 .analysis-grid{
@@ -271,8 +257,19 @@ border-radius:20px;
 border:1px solid var(--border);
 }
 
-/* Chart */
+.analysis-box h4{
+margin-bottom:10px;
+font-size:15px;
+color:#3b82f6;
+}
 
+.analysis-box p{
+font-size:14px;
+color:var(--muted);
+line-height:1.6;
+}
+
+/* Chart */
 .chart-card{
 background:var(--card);
 padding:40px;
@@ -282,6 +279,7 @@ border:1px solid var(--border);
 margin-bottom:80px;
 }
 
+/* Footer */
 footer{
 text-align:center;
 color:var(--muted);
@@ -301,7 +299,6 @@ padding-top:30px;
 <div class="status">
 <div id="dot" class="dot disconnected"></div>
 <span id="statusText">Sin conexión</span>
-<button onclick="toggleTheme()">Modo Claro/Oscuro</button>
 <button onclick="downloadExcel()">Descargar Excel</button>
 </div>
 </header>
@@ -309,6 +306,7 @@ padding-top:30px;
 <section class="hero fade">
 <h1>Monitoreo Inteligente PM2.5</h1>
 <p>Plataforma IoT para análisis ambiental avanzado en tiempo real.</p>
+<div class="clock" id="clock"></div>
 </section>
 
 <div class="main-card fade">
@@ -328,32 +326,35 @@ padding-top:30px;
 </div>
 
 <div class="metrics fade">
-
-<div class="metric" id="tempCard">
-<svg fill="currentColor" viewBox="0 0 24 24">
-<path d="M14 14.76V5a2 2 0 10-4 0v9.76a4 4 0 104 0z"/>
-</svg>
+<div class="metric">
 <h3>Temperatura</h3>
 <h2 id="temp">--</h2>
 </div>
-
-<div class="metric" id="humCard">
-<svg fill="currentColor" viewBox="0 0 24 24">
-<path d="M12 2C8 7 6 9.5 6 13a6 6 0 0012 0c0-3.5-2-6-6-11z"/>
-</svg>
+<div class="metric">
 <h3>Humedad</h3>
 <h2 id="hum">--</h2>
 </div>
-
 </div>
 
 <div class="analysis fade">
 <h3>Análisis Técnico Ambiental</h3>
 <div class="analysis-grid">
-<div class="analysis-box"><h4>Estado Actual</h4><p id="estadoBox"></p></div>
-<div class="analysis-box"><h4>Impacto en Salud</h4><p id="saludBox"></p></div>
-<div class="analysis-box"><h4>Tendencia Detectada</h4><p id="tendenciaBox"></p></div>
-<div class="analysis-box"><h4>Recomendación Técnica</h4><p id="recomendacionBox"></p></div>
+<div class="analysis-box">
+<h4>Estado Actual</h4>
+<p id="estadoBox"></p>
+</div>
+<div class="analysis-box">
+<h4>Impacto en Salud</h4>
+<p id="saludBox"></p>
+</div>
+<div class="analysis-box">
+<h4>Tendencia Detectada</h4>
+<p id="tendenciaBox"></p>
+</div>
+<div class="analysis-box">
+<h4>Recomendación Técnica</h4>
+<p id="recomendacionBox"></p>
+</div>
 </div>
 </div>
 
@@ -362,7 +363,8 @@ padding-top:30px;
 </div>
 
 <footer>
-Plataforma desarrollada por <strong>Santiago Rubio</strong> & <strong>Jheferson Imbachi</strong>
+Plataforma desarrollada por <strong>Santiago Rubio</strong> & <strong>Jheferson Imbachi</strong><br>
+Proyecto de Ingeniería Informática – Sistema IoT de monitoreo ambiental
 </footer>
 
 </div>
@@ -370,14 +372,34 @@ Plataforma desarrollada por <strong>Santiago Rubio</strong> & <strong>Jheferson 
 <script>
 const API_URL="https://air-quality-backend-66j2.onrender.com"
 
-function toggleTheme(){
-document.body.classList.toggle("light")
+const observer=new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){entry.target.classList.add("show")}
+})
+})
+document.querySelectorAll(".fade").forEach(el=>observer.observe(el))
+
+function updateClock(){
+document.getElementById("clock").innerText=new Date().toLocaleString()
 }
+setInterval(updateClock,1000)
+updateClock()
 
 function getStatus(pm){
 if(pm<=12)return ["BUENA","#22c55e","La calidad del aire es óptima."]
 if(pm<=35)return ["MODERADA","#eab308","Puede afectar población sensible."]
 return ["CRÍTICA","#ef4444","Riesgo para la salud general."]
+}
+
+function animateValue(id,start,end,duration){
+let startTime=null
+function step(timestamp){
+if(!startTime)startTime=timestamp
+let progress=Math.min((timestamp-startTime)/duration,1)
+document.getElementById(id).innerText=Math.floor(progress*(end-start)+start)
+if(progress<1)requestAnimationFrame(step)
+}
+requestAnimationFrame(step)
 }
 
 async function loadData(){
@@ -394,25 +416,13 @@ const prev=data[1]
 
 const [label,color,info]=getStatus(latest.pm25)
 
-document.getElementById("pmValue").innerText=latest.pm25
+animateValue("pmValue",0,latest.pm25,800)
 document.getElementById("pmValue").style.color=color
 document.getElementById("pmLabel").innerText=label
 document.getElementById("pmInfo").innerText=info
 
 document.getElementById("temp").innerText=latest.temperature+" °C"
 document.getElementById("hum").innerText=latest.humidity+" %"
-
-const tempCard=document.getElementById("tempCard")
-tempCard.className="metric"
-if(latest.temperature<18)tempCard.classList.add("temp-cold")
-else if(latest.temperature<28)tempCard.classList.add("temp-warm")
-else tempCard.classList.add("temp-hot")
-
-const humCard=document.getElementById("humCard")
-humCard.className="metric"
-if(latest.humidity<40)humCard.classList.add("hum-low")
-else if(latest.humidity<70)humCard.classList.add("hum-mid")
-else humCard.classList.add("hum-high")
 
 document.getElementById("marker").style.left=Math.min((latest.pm25/60)*100,100)+"%"
 
@@ -440,19 +450,33 @@ chart.update()
 }
 
 const ctx=document.getElementById("chart").getContext("2d")
+const gradient=ctx.createLinearGradient(0,0,0,400)
+gradient.addColorStop(0,"rgba(59,130,246,0.5)")
+gradient.addColorStop(1,"rgba(59,130,246,0.05)")
+
 const chart=new Chart(ctx,{
 type:"line",
 data:{labels:[],datasets:[{
 data:[],
 borderColor:"#3b82f6",
-backgroundColor:"rgba(59,130,246,0.1)",
+backgroundColor:gradient,
 fill:true,
-tension:.4
+tension:.4,
+pointRadius:3
 }]},
-options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{legend:{display:false}},
+interaction:{mode:"index",intersect:false},
+scales:{x:{grid:{display:false}},y:{grid:{color:"rgba(255,255,255,0.05)"}}
+}
+}
 })
 
-function downloadExcel(){window.open(`${API_URL}/download`)}
+function downloadExcel(){
+window.open(`${API_URL}/download`)
+}
 
 loadData()
 setInterval(loadData,5000)
