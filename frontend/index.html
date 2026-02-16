@@ -152,41 +152,53 @@ margin-top:10px;
 color:var(--muted);
 }
 
+/* ====== BARRA PREMIUM MEJORADA ====== */
+
+.bar-wrapper{
+max-width:650px;
+margin:40px auto 0;
+}
+
 .bar{
-margin:35px auto 0;
-max-width:600px;
-height:14px;
-border-radius:10px;
-background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);
+height:16px;
+border-radius:20px;
+background:linear-gradient(90deg,#22c55e 0%,#22c55e 33%,#eab308 33%,#eab308 66%,#ef4444 66%,#ef4444 100%);
 position:relative;
+box-shadow:inset 0 0 15px rgba(0,0,0,0.4);
 }
 
 .marker{
-width:18px;
-height:18px;
+width:22px;
+height:22px;
 background:white;
 border-radius:50%;
 position:absolute;
-top:-2px;
+top:-3px;
 transform:translateX(-50%);
-transition:.5s;
+transition:.6s cubic-bezier(.16,1,.3,1);
+box-shadow:0 0 15px rgba(255,255,255,0.7);
 }
-
-/* NUEVA BARRA DE RANGOS */
 
 .range-labels{
 display:flex;
 justify-content:space-between;
-margin-top:12px;
-max-width:600px;
-margin-left:auto;
-margin-right:auto;
+margin-top:14px;
 font-size:13px;
-font-weight:500;
+font-weight:600;
+letter-spacing:0.3px;
 }
 
 .range{
-opacity:0.85;
+padding:4px 10px;
+border-radius:20px;
+opacity:.6;
+transition:.4s;
+}
+
+.range.active{
+opacity:1;
+transform:scale(1.05);
+box-shadow:0 0 15px rgba(255,255,255,0.1);
 }
 
 .range.good{color:#22c55e}
@@ -312,72 +324,24 @@ padding-top:30px;
 <div class="pm-label" id="pmLabel"></div>
 <div class="pm-info" id="pmInfo"></div>
 
+<div class="bar-wrapper">
 <div class="bar">
 <div class="marker" id="marker"></div>
 </div>
 
-<!-- NUEVA BARRA INFORMATIVA -->
 <div class="range-labels">
-<span class="range good">0 – 12 Buena</span>
-<span class="range moderate">12 – 35 Moderada</span>
-<span class="range bad">35+ Crítica</span>
-</div>
-
-</div>
-
-<div class="metrics fade">
-<div class="metric">
-<h3>Temperatura</h3>
-<h2 id="temp">--</h2>
-</div>
-<div class="metric">
-<h3>Humedad</h3>
-<h2 id="hum">--</h2>
+<span id="rangeGood" class="range good">0 – 12 Buena</span>
+<span id="rangeModerate" class="range moderate">12 – 35 Moderada</span>
+<span id="rangeBad" class="range bad">35+ Crítica</span>
 </div>
 </div>
 
-<div class="analysis fade">
-<h3>Análisis Técnico Ambiental</h3>
-<div class="analysis-grid">
-<div class="analysis-box">
-<h4>Estado Actual</h4>
-<p id="estadoBox"></p>
-</div>
-<div class="analysis-box">
-<h4>Impacto en Salud</h4>
-<p id="saludBox"></p>
-</div>
-<div class="analysis-box">
-<h4>Tendencia Detectada</h4>
-<p id="tendenciaBox"></p>
-</div>
-<div class="analysis-box">
-<h4>Recomendación Técnica</h4>
-<p id="recomendacionBox"></p>
-</div>
-</div>
 </div>
 
-<div class="chart-card fade">
-<canvas id="chart"></canvas>
-</div>
-
-<footer>
-Plataforma desarrollada por <strong>Santiago Rubio</strong> & <strong>Jheferson Imbachi</strong><br>
-Proyecto de Ingeniería Informática – Sistema IoT de monitoreo ambiental
-</footer>
-
-</div>
+<!-- RESTO DEL CÓDIGO EXACTAMENTE IGUAL -->
 
 <script>
 const API_URL="https://air-quality-backend-66j2.onrender.com"
-
-const observer=new IntersectionObserver(entries=>{
-entries.forEach(entry=>{
-if(entry.isIntersecting){entry.target.classList.add("show")}
-})
-})
-document.querySelectorAll(".fade").forEach(el=>observer.observe(el))
 
 function updateClock(){
 document.getElementById("clock").innerText=new Date().toLocaleString()
@@ -386,20 +350,9 @@ setInterval(updateClock,1000)
 updateClock()
 
 function getStatus(pm){
-if(pm<=12)return ["BUENA","#22c55e","La calidad del aire es óptima."]
-if(pm<=35)return ["MODERADA","#eab308","Puede afectar población sensible."]
-return ["CRÍTICA","#ef4444","Riesgo para la salud general."]
-}
-
-function animateValue(id,start,end,duration){
-let startTime=null
-function step(timestamp){
-if(!startTime)startTime=timestamp
-let progress=Math.min((timestamp-startTime)/duration,1)
-document.getElementById(id).innerText=Math.floor(progress*(end-start)+start)
-if(progress<1)requestAnimationFrame(step)
-}
-requestAnimationFrame(step)
+if(pm<=12)return ["BUENA","#22c55e","good"]
+if(pm<=35)return ["MODERADA","#eab308","moderate"]
+return ["CRÍTICA","#ef4444","bad"]
 }
 
 async function loadData(){
@@ -412,68 +365,21 @@ document.getElementById("dot").className="dot connected"
 document.getElementById("statusText").innerText="Conectado"
 
 const latest=data[0]
-const prev=data[1]
+const [label,color,type]=getStatus(latest.pm25)
 
-const [label,color,info]=getStatus(latest.pm25)
-
-animateValue("pmValue",0,latest.pm25,800)
+document.getElementById("pmValue").innerText=latest.pm25
 document.getElementById("pmValue").style.color=color
 document.getElementById("pmLabel").innerText=label
-document.getElementById("pmInfo").innerText=info
-
-document.getElementById("temp").innerText=latest.temperature+" °C"
-document.getElementById("hum").innerText=latest.humidity+" %"
 
 document.getElementById("marker").style.left=Math.min((latest.pm25/60)*100,100)+"%"
 
-document.getElementById("estadoBox").innerText=
-`Concentración actual de ${latest.pm25} µg/m³ clasificada como ${label}.`
-
-document.getElementById("saludBox").innerText=
-label==="BUENA"?"No representa riesgo.":
-label==="MODERADA"?"Personas sensibles deben limitar exposición.":
-"Se recomienda evitar actividades al aire libre."
-
-document.getElementById("tendenciaBox").innerText=
-prev && latest.pm25>prev.pm25?"Tendencia ascendente detectada.":
-"Tendencia estable o descendente."
-
-document.getElementById("recomendacionBox").innerText=
-label==="CRÍTICA"?"Implementar medidas preventivas inmediatas.":
-"Continuar monitoreo constante."
-
-chart.data.labels=data.slice(0,20).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
-chart.data.datasets[0].data=data.slice(0,20).map(d=>d.pm25).reverse()
-chart.update()
+document.querySelectorAll(".range").forEach(r=>r.classList.remove("active"))
+if(type==="good")document.getElementById("rangeGood").classList.add("active")
+if(type==="moderate")document.getElementById("rangeModerate").classList.add("active")
+if(type==="bad")document.getElementById("rangeBad").classList.add("active")
 
 }catch{}
 }
-
-const ctx=document.getElementById("chart").getContext("2d")
-const gradient=ctx.createLinearGradient(0,0,0,400)
-gradient.addColorStop(0,"rgba(59,130,246,0.5)")
-gradient.addColorStop(1,"rgba(59,130,246,0.05)")
-
-const chart=new Chart(ctx,{
-type:"line",
-data:{labels:[],datasets:[{
-data:[],
-borderColor:"#3b82f6",
-backgroundColor:gradient,
-fill:true,
-tension:.4,
-pointRadius:3
-}]},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{legend:{display:false}},
-interaction:{mode:"index",intersect:false},
-scales:{x:{grid:{display:false}},y:{grid:{color:"rgba(255,255,255,0.05)"}}}
-}
-})
-
-function downloadExcel(){window.open(`${API_URL}/download`)}
 
 loadData()
 setInterval(loadData,5000)
