@@ -55,6 +55,8 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 margin-bottom:70px;
+flex-wrap:wrap;
+gap:15px;
 }
 
 .brand{
@@ -169,6 +171,27 @@ top:-2px;
 transform:translateX(-50%);
 transition:.5s;
 }
+
+/* NUEVA BARRA DE RANGOS */
+
+.range-labels{
+display:flex;
+justify-content:space-between;
+margin-top:12px;
+max-width:600px;
+margin-left:auto;
+margin-right:auto;
+font-size:13px;
+font-weight:500;
+}
+
+.range{
+opacity:0.85;
+}
+
+.range.good{color:#22c55e}
+.range.moderate{color:#eab308}
+.range.bad{color:#ef4444}
 
 /* Metrics */
 
@@ -288,9 +311,18 @@ padding-top:30px;
 <div class="pm-value" id="pmValue">--</div>
 <div class="pm-label" id="pmLabel"></div>
 <div class="pm-info" id="pmInfo"></div>
+
 <div class="bar">
 <div class="marker" id="marker"></div>
 </div>
+
+<!-- NUEVA BARRA INFORMATIVA -->
+<div class="range-labels">
+<span class="range good">0 – 12 Buena</span>
+<span class="range moderate">12 – 35 Moderada</span>
+<span class="range bad">35+ Crítica</span>
+</div>
+
 </div>
 
 <div class="metrics fade">
