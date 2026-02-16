@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Monitoreo Inteligente de Calidad del Aire</title>
+<title>Monitoreo Profesional de Calidad del Aire</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -11,7 +11,7 @@
   --bg:#0f172a;
   --card:#1e293b;
   --text:#ffffff;
-  --header:#1e293b;
+  --header:#111827;
 }
 
 body.light{
@@ -30,23 +30,24 @@ body{
 }
 
 /* HEADER */
-
 header{
   background:var(--header);
-  padding:22px;
+  padding:20px 30px;
   display:flex;
   justify-content:space-between;
   align-items:center;
   flex-wrap:wrap;
-  gap:15px;
 }
 
-.header-left{
+.logo{
+  font-size:20px;
+  font-weight:700;
+}
+
+.connection{
   display:flex;
   align-items:center;
-  gap:12px;
-  font-weight:600;
-  font-size:20px;
+  gap:8px;
 }
 
 .dot{
@@ -59,35 +60,70 @@ header{
 .disconnected{background:#dc2626;}
 
 button{
-  padding:9px 16px;
+  padding:8px 14px;
   border:none;
-  border-radius:10px;
-  cursor:pointer;
+  border-radius:8px;
   font-weight:600;
+  cursor:pointer;
 }
 
 .download-btn{background:#2563eb;color:white;}
 .theme-btn{background:#64748b;color:white;}
 
-.alert-banner{
-  display:none;
-  background:#dc2626;
-  color:white;
+/* HERO */
+
+.hero{
   text-align:center;
-  padding:12px;
-  font-weight:700;
-  animation:blink 1s infinite;
+  padding:40px 20px 10px 20px;
 }
 
-@keyframes blink{50%{opacity:0.6;}}
-
-.container{
-  padding:40px 25px;
-  max-width:1200px;
-  margin:auto;
+.hero h1{
+  margin:0;
+  font-size:32px;
 }
+
+.hero p{
+  max-width:700px;
+  margin:15px auto;
+  opacity:0.85;
+}
+
+/* STATUS BIG */
+
+.main-status{
+  text-align:center;
+  margin:30px 0;
+}
+
+.main-status h2{
+  font-size:36px;
+  margin:10px 0;
+}
+
+.risk-bar{
+  display:flex;
+  height:20px;
+  border-radius:10px;
+  overflow:hidden;
+  margin:15px auto;
+  max-width:600px;
+}
+
+.risk-bar div{
+  flex:1;
+}
+
+.good-zone{background:#16a34a;}
+.medium-zone{background:#eab308;}
+.bad-zone{background:#dc2626;}
 
 /* CARDS */
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
 
 .cards{
   display:grid;
@@ -97,69 +133,46 @@ button{
 }
 
 .card{
-  padding:28px;
-  border-radius:20px;
+  background:var(--card);
+  padding:25px;
+  border-radius:18px;
   text-align:center;
-  box-shadow:0 8px 25px rgba(0,0,0,0.25);
-  transition:0.3s;
-  color:white;
+  box-shadow:0 6px 20px rgba(0,0,0,0.25);
 }
 
-.card h2{
-  margin:12px 0 0 0;
-  font-size:32px;
-}
+.card h3{margin:0;}
+.card h2{margin:10px 0;font-size:28px;}
 
-.card small{
-  display:block;
-  margin-top:8px;
+.trend{
   font-size:14px;
-  opacity:0.9;
+  opacity:0.8;
 }
-
-.status{
-  margin-top:12px;
-  padding:8px;
-  border-radius:10px;
-  font-weight:700;
-}
-
-.good{background:#16a34a;}
-.medium{background:#eab308;color:black;}
-.bad{background:#dc2626;}
 
 /* GRAPH */
 
 .chart-container{
   background:var(--card);
   padding:25px;
-  border-radius:20px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.25);
+  border-radius:18px;
   margin-bottom:50px;
 }
 
-canvas{
-  height:420px !important;
-}
+canvas{height:400px !important;}
 
-/* INFO SECTION */
+/* INFO */
 
-.info-section{
+.info{
   background:var(--card);
   padding:30px;
-  border-radius:20px;
+  border-radius:18px;
   line-height:1.6;
 }
 
-.info-section h3{
-  margin-top:0;
-}
+.info h3{margin-top:0;}
 
-/* MOBILE */
-
-@media (max-width:768px){
-  header{flex-direction:column;text-align:center;}
-  .cards{grid-template-columns:1fr;}
+@media(max-width:768px){
+  header{flex-direction:column;gap:15px;}
+  .hero h1{font-size:24px;}
   canvas{height:300px !important;}
 }
 </style>
@@ -168,177 +181,150 @@ canvas{
 <body>
 
 <header>
-  <div class="header-left">
-    🌫 Monitoreo Inteligente PM2.5
-    <div style="display:flex;align-items:center;gap:6px;">
-      <div id="connectionDot" class="dot disconnected"></div>
-      <span id="connectionText">Sin conexión</span>
+  <div class="logo">🌫 Sistema Inteligente de Calidad del Aire</div>
+  <div style="display:flex;gap:15px;align-items:center;">
+    <div class="connection">
+      <div id="dot" class="dot disconnected"></div>
+      <span id="connText">Sin conexión</span>
     </div>
-  </div>
-
-  <div style="display:flex; gap:10px;">
     <button class="download-btn" onclick="downloadExcel()">Descargar Excel</button>
-    <button class="theme-btn" onclick="toggleTheme()">Modo Claro/Oscuro</button>
+    <button class="theme-btn" onclick="toggleTheme()">Modo</button>
   </div>
 </header>
 
-<div id="alert" class="alert-banner">
-⚠ ALERTA: Calidad del aire CRÍTICA
+<section class="hero">
+  <h1>Monitoreo en Tiempo Real de PM2.5</h1>
+  <p>
+    Esta plataforma permite visualizar en tiempo real la calidad del aire,
+    ayudando a comprender los riesgos asociados a las partículas PM2.5 y su impacto en la salud.
+  </p>
+</section>
+
+<div class="main-status">
+  <h2 id="overallStatus">--</h2>
+  <div class="risk-bar">
+    <div class="good-zone"></div>
+    <div class="medium-zone"></div>
+    <div class="bad-zone"></div>
+  </div>
+  <p>0–12 Buena | 13–35 Moderada | 36+ Crítica</p>
 </div>
 
 <div class="container">
 
 <div class="cards">
-  <div id="tempCard" class="card">
-    🌡 Temperatura
+  <div class="card">
+    <h3>🌡 Temperatura</h3>
     <h2 id="temp">-- °C</h2>
-    <small id="tempTrend"></small>
+    <div id="tempTrend" class="trend"></div>
   </div>
 
-  <div id="humCard" class="card">
-    💧 Humedad
+  <div class="card">
+    <h3>💧 Humedad</h3>
     <h2 id="hum">-- %</h2>
-    <small id="humTrend"></small>
+    <div id="humTrend" class="trend"></div>
   </div>
 
-  <div id="pmCard" class="card">
-    🌫 PM2.5
-    <h2 id="pm25">--</h2>
-    <div id="status" class="status">--</div>
-    <small id="pmTrend"></small>
+  <div class="card">
+    <h3>🌫 PM2.5</h3>
+    <h2 id="pm">--</h2>
+    <div id="pmTrend" class="trend"></div>
   </div>
 </div>
 
 <div class="chart-container">
-  <canvas id="airChart"></canvas>
+  <canvas id="chart"></canvas>
 </div>
 
-<div class="info-section">
+<div class="info">
   <h3>¿Qué es el PM2.5?</h3>
   <p>
-    El PM2.5 son partículas microscópicas suspendidas en el aire con un diámetro menor a 2.5 micrómetros.
-    Pueden ingresar profundamente en los pulmones y afectar la salud.
+    Son partículas microscópicas menores a 2.5 micrómetros capaces de penetrar
+    profundamente en los pulmones y afectar la salud cardiovascular y respiratoria.
   </p>
 
-  <h3>Rangos de Calidad del Aire</h3>
+  <h3>Factores que empeoran la calidad del aire</h3>
   <ul>
-    <li><strong>0 - 12 µg/m³:</strong> Buena (sin riesgo para la salud)</li>
-    <li><strong>13 - 35 µg/m³:</strong> Moderada (personas sensibles pueden verse afectadas)</li>
-    <li><strong>36+ µg/m³:</strong> Crítica (riesgo para toda la población)</li>
+    <li>Tráfico vehicular intenso</li>
+    <li>Quemas e incendios</li>
+    <li>Emisiones industriales</li>
   </ul>
 
-  <h3>¿Qué empeora la calidad del aire?</h3>
+  <h3>Factores que la mejoran</h3>
   <ul>
-    <li>Tráfico vehicular</li>
-    <li>Quema de basura o incendios</li>
-    <li>Industrias contaminantes</li>
-  </ul>
-
-  <h3>¿Qué la mejora?</h3>
-  <ul>
-    <li>Lluvias</li>
-    <li>Reducción de tráfico</li>
-    <li>Mayor presencia de vegetación</li>
+    <li>Lluvia</li>
+    <li>Reducción del tráfico</li>
+    <li>Vegetación urbana</li>
   </ul>
 </div>
 
 </div>
 
 <script>
-const API_URL = "https://air-quality-backend-66j2.onrender.com"
+const API_URL="https://air-quality-backend-66j2.onrender.com"
 
-let previous = {}
+let previous={}
 
-const ctx = document.getElementById('airChart').getContext('2d')
-const chart = new Chart(ctx,{
-  type:'line',
-  data:{labels:[],datasets:[{label:'PM2.5 (µg/m³)',data:[],borderWidth:3,tension:0.4}]},
-  options:{
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{
-      tooltip:{
-        callbacks:{
-          label:(c)=>`PM2.5: ${c.parsed.y} µg/m³`,
-          title:(c)=>c[0].label
-        }
-      }
+const ctx=document.getElementById("chart").getContext("2d")
+const chart=new Chart(ctx,{
+ type:"line",
+ data:{labels:[],datasets:[{label:"PM2.5 (µg/m³)",data:[],borderWidth:3,tension:0.4}]},
+ options:{
+  responsive:true,
+  maintainAspectRatio:false,
+  plugins:{
+   tooltip:{
+    callbacks:{
+     label:(c)=>`PM2.5: ${c.parsed.y} µg/m³`,
+     title:(c)=>c[0].label
     }
+   }
   }
+ }
 })
 
-function getPMStatus(pm){
-  if(pm<=12) return {text:"BUENO",class:"good",color:"#16a34a"}
-  if(pm<=35) return {text:"MODERADO",class:"medium",color:"#eab308"}
-  return {text:"CRÍTICO",class:"bad",color:"#dc2626"}
-}
-
-function getTempColor(t){
-  if(t<18) return "linear-gradient(135deg,#0ea5e9,#0369a1)"
-  if(t<=28) return "linear-gradient(135deg,#22c55e,#15803d)"
-  return "linear-gradient(135deg,#ef4444,#7f1d1d)"
-}
-
-function getHumColor(h){
-  if(h<40) return "linear-gradient(135deg,#f97316,#c2410c)"
-  if(h<=70) return "linear-gradient(135deg,#0ea5e9,#0369a1)"
-  return "linear-gradient(135deg,#a855f7,#6b21a8)"
+function getStatus(pm){
+ if(pm<=12)return {text:"Calidad del Aire: BUENA",color:"#16a34a"}
+ if(pm<=35)return {text:"Calidad del Aire: MODERADA",color:"#eab308"}
+ return {text:"Calidad del Aire: CRÍTICA",color:"#dc2626"}
 }
 
 async function loadData(){
-  try{
-    const res = await fetch(`${API_URL}/data`)
-    const data = await res.json()
-    if(!data.length) return
+ try{
+  const res=await fetch(`${API_URL}/data`)
+  const data=await res.json()
+  if(!data.length)return
 
-    const latest = data[0]
+  document.getElementById("dot").className="dot connected"
+  document.getElementById("connText").innerText="Conectado"
 
-    // Temperatura
-    document.getElementById('temp').innerText = latest.temperature+" °C"
-    document.getElementById('tempCard').style.background = getTempColor(latest.temperature)
+  const latest=data[0]
 
-    // Humedad
-    document.getElementById('hum').innerText = latest.humidity+" %"
-    document.getElementById('humCard').style.background = getHumColor(latest.humidity)
+  document.getElementById("temp").innerText=latest.temperature+" °C"
+  document.getElementById("hum").innerText=latest.humidity+" %"
+  document.getElementById("pm").innerText=latest.pm25
 
-    // PM2.5
-    document.getElementById('pm25').innerText = latest.pm25
-    const pmInfo = getPMStatus(latest.pm25)
-    document.getElementById('status').innerText = pmInfo.text
-    document.getElementById('status').className="status "+pmInfo.class
-    document.getElementById('pmCard').style.background = pmInfo.color
+  const status=getStatus(latest.pm25)
+  document.getElementById("overallStatus").innerText=status.text
+  document.getElementById("overallStatus").style.color=status.color
 
-    // Tendencias
-    if(previous.pm25!=null){
-      document.getElementById('pmTrend').innerText =
-        latest.pm25>previous.pm25?"⬆ Empeorando":"⬇ Mejorando"
-    }
-    if(previous.temp!=null){
-      document.getElementById('tempTrend').innerText =
-        latest.temperature>previous.temp?"⬆ Subiendo temperatura":"⬇ Bajando temperatura"
-    }
-    if(previous.hum!=null){
-      document.getElementById('humTrend').innerText =
-        latest.humidity>previous.hum?"⬆ Aumentando humedad":"⬇ Disminuyendo humedad"
-    }
+  if(previous.pm!=null){
+   document.getElementById("pmTrend").innerText=latest.pm25>previous.pm?"⬆ Empeorando":"⬇ Mejorando"
+   document.getElementById("tempTrend").innerText=latest.temperature>previous.temp?"⬆ Subiendo":"⬇ Bajando"
+   document.getElementById("humTrend").innerText=latest.humidity>previous.hum?"⬆ Aumentando":"⬇ Disminuyendo"
+  }
 
-    previous={
-      pm25:latest.pm25,
-      temp:latest.temperature,
-      hum:latest.humidity
-    }
+  previous={pm:latest.pm25,temp:latest.temperature,hum:latest.humidity}
 
-    chart.data.labels = data.slice(0,12).map(d=>
-      new Date(d.created_at).toLocaleString()
-    ).reverse()
+  chart.data.labels=data.slice(0,12).map(d=>new Date(d.created_at).toLocaleString()).reverse()
+  chart.data.datasets[0].data=data.slice(0,12).map(d=>d.pm25).reverse()
+  chart.data.datasets[0].borderColor=status.color
+  chart.update()
 
-    chart.data.datasets[0].data =
-      data.slice(0,12).map(d=>d.pm25).reverse()
-
-    chart.data.datasets[0].borderColor = pmInfo.color
-    chart.update()
-
-  }catch{}
+ }catch{
+  document.getElementById("dot").className="dot disconnected"
+  document.getElementById("connText").innerText="Sin conexión"
+ }
 }
 
 function downloadExcel(){window.open(`${API_URL}/download`)}
