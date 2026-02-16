@@ -3,62 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AirSense | Monitoreo Inteligente PM2.5</title>
+<title>AirSense Pro | Monitoreo Inteligente</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script>
 
 <style>
 :root{
-  --bg:#0b1120;
-  --card:#111827;
-  --glass:rgba(255,255,255,0.05);
-  --text:#f1f5f9;
+  --bg:#0b1220;
+  --card:rgba(255,255,255,0.05);
+  --glass:rgba(255,255,255,0.08);
+  --text:#f8fafc;
   --muted:#94a3b8;
-  --primary:#3b82f6;
 }
 
 body.light{
   --bg:#f1f5f9;
   --card:#ffffff;
-  --glass:rgba(0,0,0,0.04);
+  --glass:rgba(0,0,0,0.05);
   --text:#0f172a;
   --muted:#475569;
 }
 
-*{box-sizing:border-box}
-
 body{
   margin:0;
-  font-family:Inter,Segoe UI,Arial;
+  font-family:Inter,Segoe UI;
   background:var(--bg);
   color:var(--text);
-  transition:0.3s ease;
+  transition:0.3s;
 }
-
-/* NAVBAR */
 
 header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:18px 30px;
-  backdrop-filter:blur(10px);
+  padding:20px 40px;
+  backdrop-filter:blur(12px);
   background:var(--glass);
   position:sticky;
   top:0;
-  z-index:100;
+  z-index:10;
 }
 
 .logo{
   font-weight:700;
   font-size:20px;
-  letter-spacing:0.5px;
+  letter-spacing:1px;
 }
 
 .connection{
   display:flex;
   align-items:center;
   gap:8px;
-  font-size:14px;
 }
 
 .dot{
@@ -81,67 +76,26 @@ button{
 .download-btn{background:#2563eb;color:white;}
 .theme-btn{background:#64748b;color:white;}
 
-/* HERO */
-
 .hero{
   text-align:center;
-  padding:60px 20px 20px;
+  padding:60px 20px 30px;
 }
 
 .hero h1{
-  font-size:36px;
-  margin:0;
+  font-size:40px;
   background:linear-gradient(90deg,#3b82f6,#22c55e);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
+  margin:0;
 }
 
 .hero p{
-  max-width:700px;
+  max-width:750px;
   margin:20px auto;
   color:var(--muted);
 }
 
-/* STATUS BADGE */
-
-.main-status{
-  text-align:center;
-  margin:30px 0 10px;
-}
-
-.badge{
-  display:inline-block;
-  padding:12px 24px;
-  border-radius:30px;
-  font-weight:700;
-  font-size:18px;
-  margin-bottom:10px;
-}
-
-.update-time{
-  font-size:13px;
-  color:var(--muted);
-}
-
-/* RISK BAR */
-
-.risk-bar{
-  display:flex;
-  max-width:600px;
-  margin:15px auto;
-  height:14px;
-  border-radius:8px;
-  overflow:hidden;
-}
-
-.risk-bar div{flex:1;}
-.good-zone{background:#22c55e;}
-.medium-zone{background:#eab308;}
-.bad-zone{background:#ef4444;}
-
-/* DASHBOARD */
-
-.container{
+.dashboard{
   max-width:1200px;
   margin:auto;
   padding:20px;
@@ -156,6 +110,7 @@ button{
 
 .card{
   background:var(--card);
+  backdrop-filter:blur(15px);
   padding:25px;
   border-radius:18px;
   box-shadow:0 8px 25px rgba(0,0,0,0.3);
@@ -163,27 +118,37 @@ button{
 }
 
 .card:hover{
-  transform:translateY(-5px);
+  transform:translateY(-6px);
 }
 
-.card h3{margin:0;font-size:16px;color:var(--muted);}
-.card h2{margin:10px 0;font-size:30px;}
-.trend{font-size:14px;color:var(--muted);}
+.card h3{
+  margin:0;
+  font-size:14px;
+  color:var(--muted);
+}
 
-/* GRAPH */
+.card h2{
+  margin:12px 0;
+  font-size:32px;
+}
+
+.trend{
+  font-size:14px;
+  color:var(--muted);
+}
 
 .chart-container{
   background:var(--card);
   padding:25px;
-  border-radius:18px;
-  margin-bottom:50px;
+  border-radius:20px;
+  margin-bottom:40px;
 }
 
-canvas{height:400px !important;}
+canvas{
+  height:420px !important;
+}
 
-/* INFO CARDS */
-
-.info-grid{
+.info{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
   gap:20px;
@@ -193,10 +158,7 @@ canvas{height:400px !important;}
   background:var(--card);
   padding:25px;
   border-radius:16px;
-  line-height:1.6;
 }
-
-.info-card h4{margin-top:0;}
 
 footer{
   text-align:center;
@@ -207,7 +169,7 @@ footer{
 
 @media(max-width:768px){
   header{flex-direction:column;gap:15px;}
-  .hero h1{font-size:26px;}
+  .hero h1{font-size:28px;}
   canvas{height:300px !important;}
 }
 </style>
@@ -216,7 +178,7 @@ footer{
 <body>
 
 <header>
-  <div class="logo">🌫 AirSense Dashboard</div>
+  <div class="logo">🌫 AirSense Pro</div>
   <div style="display:flex;gap:15px;align-items:center;">
     <div class="connection">
       <div id="dot" class="dot disconnected"></div>
@@ -229,23 +191,13 @@ footer{
 
 <section class="hero">
   <h1>Monitoreo Inteligente de Calidad del Aire</h1>
-  <p>Visualización profesional en tiempo real de partículas PM2.5 y variables ambientales para análisis y toma de decisiones.</p>
+  <p>
+    Plataforma avanzada de visualización ambiental en tiempo real.
+    Permite analizar concentración de partículas PM2.5, tendencias y riesgos para la salud.
+  </p>
 </section>
 
-<div class="main-status">
-  <div id="badge" class="badge">--</div>
-  <div class="update-time" id="lastUpdate">Actualizando...</div>
-  <div class="risk-bar">
-    <div class="good-zone"></div>
-    <div class="medium-zone"></div>
-    <div class="bad-zone"></div>
-  </div>
-  <div style="font-size:13px;color:var(--muted);">
-    0–12 Buena | 13–35 Moderada | 36+ Crítica
-  </div>
-</div>
-
-<div class="container">
+<div class="dashboard">
 
 <div class="cards">
   <div class="card">
@@ -271,25 +223,25 @@ footer{
   <canvas id="chart"></canvas>
 </div>
 
-<div class="info-grid">
+<div class="info">
   <div class="info-card">
-    <h4>¿Qué es el PM2.5?</h4>
-    Son partículas microscópicas capaces de penetrar profundamente en los pulmones y afectar la salud respiratoria y cardiovascular.
+    <h4>¿Qué es PM2.5?</h4>
+    Son partículas microscópicas menores a 2.5 µm que pueden ingresar profundamente en los pulmones.
   </div>
   <div class="info-card">
-    <h4>Factores que empeoran</h4>
-    Tráfico, incendios, industrias y condiciones climáticas sin viento.
+    <h4>Riesgos</h4>
+    Exposición prolongada puede generar enfermedades respiratorias y cardiovasculares.
   </div>
   <div class="info-card">
-    <h4>Factores que mejoran</h4>
-    Lluvia, reducción vehicular y presencia de vegetación.
+    <h4>Factores que influyen</h4>
+    Tráfico, industria, incendios, condiciones climáticas.
   </div>
 </div>
 
 </div>
 
 <footer>
-AirSense © 2026 | Sistema Inteligente de Monitoreo Ambiental
+AirSense Pro © 2026 | Sistema Inteligente de Monitoreo Ambiental
 </footer>
 
 <script>
@@ -297,17 +249,28 @@ const API_URL="https://air-quality-backend-66j2.onrender.com"
 let previous={}
 
 const ctx=document.getElementById("chart").getContext("2d")
+
+const gradient=ctx.createLinearGradient(0,0,0,400)
+gradient.addColorStop(0,"rgba(59,130,246,0.6)")
+gradient.addColorStop(1,"rgba(59,130,246,0.05)")
+
 const chart=new Chart(ctx,{
  type:"line",
- data:{labels:[],datasets:[{label:"PM2.5 (µg/m³)",data:[],borderWidth:3,tension:0.4}]},
- options:{responsive:true,maintainAspectRatio:false}
+ data:{labels:[],datasets:[{
+  label:"PM2.5 (µg/m³)",
+  data:[],
+  fill:true,
+  backgroundColor:gradient,
+  borderColor:"#3b82f6",
+  tension:0.4,
+  pointRadius:4
+ }]},
+ options:{
+  responsive:true,
+  maintainAspectRatio:false,
+  interaction:{mode:"index",intersect:false}
+ }
 })
-
-function getStatus(pm){
- if(pm<=12)return {text:"Calidad BUENA",color:"#22c55e"}
- if(pm<=35)return {text:"Calidad MODERADA",color:"#eab308"}
- return {text:"Calidad CRÍTICA",color:"#ef4444"}
-}
 
 async function loadData(){
  try{
@@ -324,15 +287,6 @@ async function loadData(){
   document.getElementById("hum").innerText=latest.humidity+" %"
   document.getElementById("pm").innerText=latest.pm25
 
-  const status=getStatus(latest.pm25)
-  const badge=document.getElementById("badge")
-  badge.innerText=status.text
-  badge.style.background=status.color
-  badge.style.color="white"
-
-  document.getElementById("lastUpdate").innerText=
-   "Última actualización: "+new Date(latest.created_at).toLocaleString()
-
   if(previous.pm!=null){
    document.getElementById("pmTrend").innerText=latest.pm25>previous.pm?"⬆ Empeorando":"⬇ Mejorando"
    document.getElementById("tempTrend").innerText=latest.temperature>previous.temp?"⬆ Subiendo":"⬇ Bajando"
@@ -341,9 +295,8 @@ async function loadData(){
 
   previous={pm:latest.pm25,temp:latest.temperature,hum:latest.humidity}
 
-  chart.data.labels=data.slice(0,12).map(d=>new Date(d.created_at).toLocaleString()).reverse()
-  chart.data.datasets[0].data=data.slice(0,12).map(d=>d.pm25).reverse()
-  chart.data.datasets[0].borderColor=status.color
+  chart.data.labels=data.slice(0,15).map(d=>new Date(d.created_at).toLocaleString()).reverse()
+  chart.data.datasets[0].data=data.slice(0,15).map(d=>d.pm25).reverse()
   chart.update()
 
  }catch{
