@@ -194,7 +194,7 @@ font-weight:500;
 .range.moderate{color:#eab308}
 .range.bad{color:#ef4444}
 
-/* Metrics MEJORADAS */
+/* Metrics */
 .metrics{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -303,205 +303,85 @@ padding-bottom:40px;
 border-top:1px solid var(--border);
 padding-top:30px;
 }
+
+/* ========================= */
+/* 📱 AJUSTES SOLO MÓVIL */
+/* ========================= */
+@media (max-width: 768px){
+
+.wrapper{
+padding:40px 18px;
+}
+
+header{
+flex-direction:column;
+text-align:center;
+}
+
+.status{
+flex-direction:column;
+gap:12px;
+}
+
+.hero h1{
+font-size:30px;
+}
+
+.hero p{
+font-size:14px;
+padding:0 10px;
+}
+
+.main-card{
+padding:35px 20px;
+border-radius:22px;
+}
+
+.pm-value{
+font-size:55px;
+}
+
+.pm-label{
+font-size:20px;
+}
+
+.bar{
+max-width:100%;
+}
+
+.range-labels{
+max-width:100%;
+font-size:11px;
+text-align:center;
+}
+
+.metrics{
+grid-template-columns:1fr;
+gap:20px;
+}
+
+.metric{
+padding:30px 20px;
+}
+
+.analysis{
+padding:30px 20px;
+}
+
+.analysis-grid{
+grid-template-columns:1fr;
+}
+
+.chart-card{
+height:350px;
+padding:25px 15px;
+border-radius:22px;
+}
+
+footer{
+padding-left:15px;
+padding-right:15px;
+}
+}
 </style>
 </head>
-
-<body>
-<div class="wrapper">
-
-<header class="fade">
-<div class="brand">Sistema Inteligente de Calidad del Aire</div>
-<div class="status">
-<div id="dot" class="dot disconnected"></div>
-<span id="statusText">Sin conexión</span>
-<button onclick="toggleTheme()">Modo Claro/Oscuro</button>
-<button onclick="downloadExcel()">Descargar Excel</button>
-</div>
-</header>
-
-<section class="hero fade">
-<h1>Monitoreo Inteligente </h1>
-<p>Plataforma IoT para análisis ambiental avanzado en tiempo real.</p>
-<div class="clock" id="clock"></div>
-</section>
-
-<div class="main-card fade">
-<div class="pm-value" id="pmValue">--</div>
-<div class="pm-label" id="pmLabel"></div>
-<div class="pm-info" id="pmInfo"></div>
-<div class="bar">
-<div class="marker" id="marker"></div>
-</div>
-
-<div class="range-labels">
-<span class="range good">0 – 12 Buena</span>
-<span class="range moderate">12 – 35 Moderada</span>
-<span class="range bad">35+ Crítica</span>
-</div>
-</div>
-
-<div class="metrics fade">
-<div class="metric">
-<h3>Temperatura</h3>
-<h2 id="temp">--</h2>
-</div>
-<div class="metric">
-<h3>Humedad</h3>
-<h2 id="hum">--</h2>
-</div>
-</div>
-
-<div class="analysis fade">
-<h3>Análisis Técnico Ambiental</h3>
-<div class="analysis-grid">
-<div class="analysis-box">
-<h4>Estado Actual</h4>
-<p id="estadoBox"></p>
-</div>
-<div class="analysis-box">
-<h4>Impacto en Salud</h4>
-<p id="saludBox"></p>
-</div>
-<div class="analysis-box">
-<h4>Tendencia Detectada</h4>
-<p id="tendenciaBox"></p>
-</div>
-<div class="analysis-box">
-<h4>Recomendación Técnica</h4>
-<p id="recomendacionBox"></p>
-</div>
-</div>
-</div>
-
-<div class="chart-card fade">
-<canvas id="chart"></canvas>
-</div>
-
-<footer>
-Plataforma desarrollada por <strong>Santiago Rubio</strong><strong></strong><br>
-Proyecto de Ingeniería Informática – Sistema IoT de monitoreo ambiental
-</footer>
-
-</div>
-
-<script>
-const API_URL="https://air-quality-backend-66j2.onrender.com"
-
-function toggleTheme(){
-document.body.classList.toggle("light")
-}
-
-const observer=new IntersectionObserver(entries=>{
-entries.forEach(entry=>{
-if(entry.isIntersecting){entry.target.classList.add("show")}
-})
-})
-document.querySelectorAll(".fade").forEach(el=>observer.observe(el))
-
-function updateClock(){
-document.getElementById("clock").innerText=new Date().toLocaleString()
-}
-setInterval(updateClock,1000)
-updateClock()
-
-function getStatus(pm){
-if(pm<=12)return ["BUENA","#22c55e","La calidad del aire es óptima."]
-if(pm<=35)return ["MODERADA","#eab308","Puede afectar población sensible."]
-return ["CRÍTICA","#ef4444","Riesgo para la salud general."]
-}
-
-function animateValue(id,start,end,duration){
-let startTime=null
-function step(timestamp){
-if(!startTime)startTime=timestamp
-let progress=Math.min((timestamp-startTime)/duration,1)
-document.getElementById(id).innerText=Math.floor(progress*(end-start)+start)
-if(progress<1)requestAnimationFrame(step)
-}
-requestAnimationFrame(step)
-}
-
-async function loadData(){
-try{
-const res=await fetch(`${API_URL}/data`)
-const data=await res.json()
-if(!data.length)return
-
-document.getElementById("dot").className="dot connected"
-document.getElementById("statusText").innerText="Conectado"
-
-const latest=data[0]
-const prev=data[1]
-
-const [label,color,info]=getStatus(latest.pm25)
-
-animateValue("pmValue",0,latest.pm25,800)
-document.getElementById("pmValue").style.color=color
-document.getElementById("pmLabel").innerText=label
-document.getElementById("pmInfo").innerText=info
-
-document.getElementById("temp").innerText=latest.temperature+" °C"
-document.getElementById("hum").innerText=latest.humidity+" %"
-
-document.getElementById("marker").style.left=Math.min((latest.pm25/60)*100,100)+"%"
-
-document.getElementById("estadoBox").innerText=
-`Concentración actual de ${latest.pm25} µg/m³ clasificada como ${label}.`
-
-document.getElementById("saludBox").innerText=
-label==="BUENA"?"No representa riesgo.":
-label==="MODERADA"?"Personas sensibles deben limitar exposición.":
-"Se recomienda evitar actividades al aire libre."
-
-document.getElementById("tendenciaBox").innerText=
-prev && latest.pm25>prev.pm25?"Tendencia ascendente detectada.":
-"Tendencia estable o descendente."
-
-document.getElementById("recomendacionBox").innerText=
-label==="CRÍTICA"?"Implementar medidas preventivas inmediatas.":
-"Continuar monitoreo constante."
-
-chart.data.labels=data.slice(0,20).map(d=>new Date(d.created_at).toLocaleTimeString()).reverse()
-chart.data.datasets[0].data=data.slice(0,20).map(d=>d.pm25).reverse()
-chart.update()
-
-}catch{}
-}
-
-const ctx=document.getElementById("chart").getContext("2d")
-const gradient=ctx.createLinearGradient(0,0,0,400)
-gradient.addColorStop(0,"rgba(59,130,246,0.5)")
-gradient.addColorStop(1,"rgba(59,130,246,0.05)")
-
-const chart=new Chart(ctx,{
-type:"line",
-data:{labels:[],datasets:[{
-data:[],
-borderColor:"#3b82f6",
-backgroundColor:gradient,
-fill:true,
-tension:.4,
-pointRadius:3
-}]},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{legend:{display:false}},
-interaction:{mode:"index",intersect:false},
-scales:{
-x:{grid:{display:false}},
-y:{grid:{color:"rgba(255,255,255,0.05)"}}
-}
-}
-})
-
-function downloadExcel(){
-window.open(`${API_URL}/download`)
-}
-
-loadData()
-setInterval(loadData,5000)
-</script>
-
-</body>
-</html>
