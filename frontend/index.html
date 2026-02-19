@@ -152,9 +152,9 @@ footer{ text-align:center; color:var(--muted); font-size:14px; padding-bottom:40
     </div>
 
     <div class="range-labels" style="max-width:250px;font-size:11px;">
-      <span class="range good">0 – 9 Buena</span>
-      <span class="range moderate">9 – 35 Moderada</span>
-      <span class="range bad">35+ Crítica</span>
+      <span class="range good">0 – 550 Buena</span>
+      <span class="range moderate">551 – 800 Moderada</span>
+      <span class="range bad">801+ Crítica</span>
     </div>
 
   </div>
@@ -214,8 +214,8 @@ function getStatus(pm){
 }
 
 function getCOStatus(co){
-  if(co<=9) return ["BUENA","#22c55e"];
-  if(co<=35) return ["MODERADA","#eab308"];
+  if(co<=550) return ["BUENA","#22c55e"];
+  if(co<=800) return ["MODERADA","#eab308"];
   return ["CRÍTICA","#ef4444"];
 }
 
@@ -251,7 +251,7 @@ async function loadData(){
 
     document.getElementById("temp").innerText=latest.temperature+" °C";
     document.getElementById("hum").innerText=latest.humidity+" %";
-    document.getElementById("co").innerText=latest.co+" ppm";
+    document.getElementById("co").innerText=latest.co+" ADC";
 
     const [coLabel,coColor]=getCOStatus(latest.co);
     document.getElementById("co").style.color=coColor;
