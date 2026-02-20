@@ -183,7 +183,13 @@ footer{ text-align:center; color:var(--muted); font-size:14px; padding-bottom:40
 </div>
 
 <div class="chart-card fade">
-  <canvas id="chart"></canvas>
+  <h3 style="text-align:center;margin-bottom:20px;">Histórico PM2.5</h3>
+  <canvas id="chartPM"></canvas>
+</div>
+
+<div class="chart-card fade">
+  <h3 style="text-align:center;margin-bottom:20px;">Histórico CO (ADC)</h3>
+  <canvas id="chartCO"></canvas>
 </div>
 
 <footer>
@@ -281,58 +287,73 @@ async function loadData(){
 
     const last20 = data.slice(0,20).reverse();
 
-chart.data.labels = last20.map(d =>
+const labels = last20.map(d =>
   d.created_at ? new Date(d.created_at).toLocaleTimeString() : "--"
 );
 
-// Dataset 0 = PM2.5
-chart.data.datasets[0].data = last20.map(d =>
+// PM2.5
+chartPM.data.labels = labels;
+chartPM.data.datasets[0].data = last20.map(d =>
   d.pm25 ? Number(d.pm25) : null
 );
+chartPM.update();
 
-// Dataset 1 = CO
-chart.data.datasets[1].data = last20.map(d =>
+// CO
+chartCO.data.labels = labels;
+chartCO.data.datasets[0].data = last20.map(d =>
   d.co ? Number(d.co) : null
 );
-
-chart.update();
-
+chartCO.update();
 
   }catch(err){
     console.error("Error cargando datos:",err);
   }
 }
 
-const ctx=document.getElementById("chart").getContext("2d");
+const ctxPM = document.getElementById("chartPM").getContext("2d");
+const ctxCO = document.getElementById("chartCO").getContext("2d");
 const gradient=ctx.createLinearGradient(0,0,0,400);
 gradient.addColorStop(0,"rgba(59,130,246,0.5)");
 gradient.addColorStop(1,"rgba(59,130,246,0.05)");
 
-const chart=new Chart(ctx,{
+const chartPM = new Chart(ctxPM,{
   type:"line",
   data:{
     labels:[],
-    datasets:[
-      {
-        label:"PM2.5",
-        data:[],
-        borderColor:"#3b82f6",
-        backgroundColor:gradient,
-        fill:true,
-        tension:.4,
-        pointRadius:3
-      },
-      {
-        label:"CO (ADC)",
-        data:[],
-        borderColor:"#ef4444",
-        backgroundColor:"rgba(239,68,68,0.15)",
-        fill:false,
-        tension:.4,
-        pointRadius:3
-      }
-    ]
+    datasets:[{
+      label:"PM2.5",
+      data:[],
+      borderColor:"#3b82f6",
+      backgroundColor:"rgba(59,130,246,0.15)",
+      fill:true,
+      tension:.4,
+      pointRadius:3
+    }]
   },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false
+  }
+});
+const chartCO = new Chart(ctxCO,{
+  type:"line",
+  data:{
+    labels:[],
+    datasets:[{
+      label:"CO (ADC)",
+      data:[],
+      borderColor:"#ef4444",
+      backgroundColor:"rgba(239,68,68,0.15)",
+      fill:true,
+      tension:.4,
+      pointRadius:3
+    }]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false
+  }
+});
   options:{
     responsive:true,
     maintainAspectRatio:false,
