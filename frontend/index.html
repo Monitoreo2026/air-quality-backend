@@ -152,9 +152,9 @@ footer{ text-align:center; color:var(--muted); font-size:14px; padding-bottom:40
     </div>
 
     <div class="range-labels" style="max-width:250px;font-size:11px;">
-      <span class="range good">0 – 550 Buena</span>
-      <span class="range moderate">551 – 800 Moderada</span>
-      <span class="range bad">801+ Crítica</span>
+      <span class="range good">0 – 1500 Buena</span>
+      <span class="range moderate">1501 – 3000 Moderada</span>
+      <span class="range bad">3001+ Crítica</span>
     </div>
 
   </div>
@@ -214,8 +214,8 @@ function getStatus(pm){
 }
 
 function getCOStatus(co){
-  if(co<=550) return ["BUENA","#22c55e"];
-  if(co<=800) return ["MODERADA","#eab308"];
+  if(co<=1500) return ["BUENA","#22c55e"];
+  if(co<=3001) return ["MODERADA","#eab308"];
   return ["CRÍTICA","#ef4444"];
 }
 
@@ -256,7 +256,7 @@ async function loadData(){
     const [coLabel,coColor]=getCOStatus(latest.co);
     document.getElementById("co").style.color=coColor;
     document.getElementById("coMarker").style.left=
-      Math.min((latest.co/50)*100,100)+"%";
+      Math.min((latest.co/4095)*100,100)+"%";
 
     document.getElementById("marker").style.left=
       Math.min((latest.pm25/60)*100,100)+"%";
