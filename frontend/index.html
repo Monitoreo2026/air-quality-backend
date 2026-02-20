@@ -312,9 +312,7 @@ chartCO.update();
 
 const ctxPM = document.getElementById("chartPM").getContext("2d");
 const ctxCO = document.getElementById("chartCO").getContext("2d");
-const gradient=ctx.createLinearGradient(0,0,0,400);
-gradient.addColorStop(0,"rgba(59,130,246,0.5)");
-gradient.addColorStop(1,"rgba(59,130,246,0.05)");
+
 
 const chartPM = new Chart(ctxPM,{
   type:"line",
@@ -354,17 +352,7 @@ const chartCO = new Chart(ctxCO,{
     maintainAspectRatio:false
   }
 });
-  options:{
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{legend:{display:false}},
-    interaction:{mode:"index",intersect:false},
-    scales:{
-      x:{grid:{display:false}},
-      y:{grid:{color:"rgba(255,255,255,0.05)"}}
-    }
-  }
-});
+ 
 
 function downloadExcel(){ window.open(`${API_URL}/download`); }
 
