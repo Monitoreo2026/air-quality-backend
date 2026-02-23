@@ -360,23 +360,15 @@ const chartCO = new Chart(ctxCO,{
   scales:{
     y:{
       min:0,
-      max:4095,
+      max:4000,
       ticks:{
-        stepSize:1000,   // menos números
-        callback:function(value){
-          return value; // puedes cambiar a "value + ' ADC'" si quieres
-        }
-      },
-      grid:{
-        color:"rgba(255,255,255,0.05)"
+        stepSize:1000,
+        precision:0
       }
     },
     x:{
       ticks:{
-        maxTicksLimit:6   // solo 6 etiquetas abajo
-      },
-      grid:{
-        display:false
+        maxTicksLimit:6
       }
     }
   }
