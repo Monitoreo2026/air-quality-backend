@@ -329,9 +329,18 @@ const chartPM = new Chart(ctxPM,{
     }]
   },
   options:{
-    responsive:true,
-    maintainAspectRatio:false
+  responsive:true,
+  maintainAspectRatio:false,
+  scales:{
+    y:{
+      min:0,
+      max:60,
+      ticks:{
+        stepSize:10
+      }
+    }
   }
+}
 });
 const chartCO = new Chart(ctxCO,{
   type:"line",
@@ -348,9 +357,18 @@ const chartCO = new Chart(ctxCO,{
     }]
   },
   options:{
-    responsive:true,
-    maintainAspectRatio:false
+  responsive:true,
+  maintainAspectRatio:false,
+  scales:{
+    y:{
+      min:0,
+      max:4095,
+      ticks:{
+        stepSize:500
+      }
+    }
   }
+}
 });
  
 
