@@ -287,9 +287,7 @@ async function loadData(){
 
     const last20 = data.slice(0,20).reverse();
 
-const labels = last20.map(d =>
-  d.created_at ? new Date(d.created_at).toLocaleTimeString() : "--"
-);
+const labels = last20.map((d, index) => index + 1);
 
 // PM2.5
 chartPM.data.labels = labels;
@@ -364,7 +362,21 @@ const chartCO = new Chart(ctxCO,{
       min:0,
       max:4095,
       ticks:{
-        stepSize:500
+        stepSize:1000,   // menos números
+        callback:function(value){
+          return value; // puedes cambiar a "value + ' ADC'" si quieres
+        }
+      },
+      grid:{
+        color:"rgba(255,255,255,0.05)"
+      }
+    },
+    x:{
+      ticks:{
+        maxTicksLimit:6   // solo 6 etiquetas abajo
+      },
+      grid:{
+        display:false
       }
     }
   }
