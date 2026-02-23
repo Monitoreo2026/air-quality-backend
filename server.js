@@ -82,10 +82,10 @@ worksheet.mergeCells('A2:E2')
       let statusText = ''
       let statusColor = ''
 
-      if (latest.pm25 <= 50) {
+      if (latest.pm25 <= 12) {
         statusText = 'BUENO'
         statusColor = 'FF16A34A'
-      } else if (latest.pm25 <= 150) {
+      } else if (latest.pm25 <= 35) {
         statusText = 'MODERADO'
         statusColor = 'FFEAB308'
       } else {
@@ -171,10 +171,10 @@ worksheet.mergeCells('A2:E2')
       // Color dinámico PM2.5
       const pmCell = newRow.getCell(4)
 
-      if (row.pm25 <= 50) {
+      if (row.pm25 <= 12) {
         pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16A34A' } }
         pmCell.font = { color: { argb: 'FFFFFFFF' } }
-      } else if (row.pm25 <= 150) {
+      } else if (row.pm25 <= 35) {
         pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEAB308' } }
       } else {
         pmCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDC2626' } }
