@@ -250,7 +250,7 @@ async function loadData(){
 
     const [label,color,info]=getStatus(latest.pm25);
 
-    animateValue("pmValue",0,latest.pm25,800);
+    document.getElementById("pmValue").innerText = latest.pm25;
     document.getElementById("pmValue").style.color=color;
     document.getElementById("pmLabel").innerText=label;
     document.getElementById("pmInfo").innerText=info;
