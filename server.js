@@ -223,7 +223,7 @@ worksheet.mergeCells('A2:E2')
 
     res.setHeader(
       'Content-Disposition',
-      'attachment; filename=Informe_Monitoreo_Ambiental.xlsx'
+      'attachment; filename=Informe_Monitoreo_.xlsx'
     )
 
     await workbook.xlsx.write(res)
