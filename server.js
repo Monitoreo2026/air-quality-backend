@@ -18,35 +18,78 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 )
 
+// =============================
+// ✅ RUTA DE PRUEBA DEL ENTORNO
+// =============================
+app.get('/test-env', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('air_readings')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(3)
+
+    res.json({
+      supabaseUrl: process.env.SUPABASE_URL || null,
+      hasSupabaseKey: !!process.env.SUPABASE_KEY,
+      count: data ? data.length : 0,
+      error: error ? error.message : null,
+      sample: data || []
+    })
+  } catch (err) {
+    res.json({
+      supabaseUrl: process.env.SUPABASE_URL || null,
+      hasSupabaseKey: !!process.env.SUPABASE_KEY,
+      crash: err.message
+    })
+  }
+})
 
 // =============================
 // 📊 ENDPOINT DATOS
 // =============================
 app.get('/data', async (req, res) => {
   try {
+    console.log('Consultando /data...')
+    console.log('SUPABASE_URL cargada:', process.env.SUPABASE_URL)
+    console.log('SUPABASE_KEY cargada:', !!process.env.SUPABASE_KEY)
+
     const { data, error } = await supabase
       .from('air_readings')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(50)
 
-    if (error) throw error
+    if (error) {
+      console.error('Error Supabase en /data:', error)
+      return res.status(500).json({
+        ok: false,
+        where: '/data query',
+        error: error.message
+      })
+    }
 
-    res.json(data)
+    return res.json({
+      ok: true,
+      total: data.length,
+      data
+    })
 
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Error obteniendo datos' })
+    console.error('Error general en /data:', err)
+    return res.status(500).json({
+      ok: false,
+      where: 'catch /data',
+      error: err.message
+    })
   }
 })
-
 
 // =============================
 // 📥 EXCEL PROFESIONAL FINAL
 // =============================
 app.get('/download', async (req, res) => {
   try {
-
     const { data, error } = await supabase
       .from('air_readings')
       .select('*')
@@ -57,25 +100,22 @@ app.get('/download', async (req, res) => {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Reporte')
 
-    // ===== FUNCION HORA COLOMBIA =====
     const fechaColombia = (fecha) =>
       new Date(fecha).toLocaleString('es-CO', {
         timeZone: 'America/Bogota'
       })
 
-    // ===== TITULO =====
-worksheet.mergeCells('A1:E1')
+    worksheet.mergeCells('A1:E1')
     const title = worksheet.getCell('A1')
     title.value = 'INFORME GENERAL DE MONITOREO'
     title.font = { size: 18, bold: true }
     title.alignment = { horizontal: 'center' }
 
-worksheet.mergeCells('A2:E2')
+    worksheet.mergeCells('A2:E2')
     worksheet.getCell('A2').value =
       `Fecha de generación: ${fechaColombia(new Date())}`
     worksheet.getCell('A2').alignment = { horizontal: 'center' }
 
-    // ===== ESTADO ACTUAL =====
     if (data.length > 0) {
       const latest = data[0]
 
@@ -108,14 +148,13 @@ worksheet.mergeCells('A2:E2')
 
     worksheet.addRow([])
 
-    // ===== ENCABEZADOS =====
     const headerRow = worksheet.addRow([
-  'Fecha',
-  'Temperatura (°C)',
-  'Humedad (%)',
-  'PM2.5 (µg/m³)',
-  'CO (ADC)'
-])
+      'Fecha',
+      'Temperatura (°C)',
+      'Humedad (%)',
+      'PM2.5 (µg/m³)',
+      'CO (ADC)'
+    ])
 
     headerRow.eachCell(cell => {
       cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
@@ -134,29 +173,26 @@ worksheet.mergeCells('A2:E2')
     })
 
     worksheet.columns = [
-  { width: 22 },
-  { width: 18 },
-  { width: 15 },
-  { width: 15 },
-  { width: 15 }
-]
+      { width: 22 },
+      { width: 18 },
+      { width: 15 },
+      { width: 15 },
+      { width: 15 }
+    ]
 
-    // ===== VARIABLES PROMEDIOS =====
     let sumTemp = 0
     let sumHum = 0
     let sumPM25 = 0
     let sumCO = 0
 
-    // ===== FILAS DE DATOS =====
     data.forEach(row => {
-
       const newRow = worksheet.addRow([
-  fechaColombia(row.created_at),
-  row.temperature,
-  row.humidity,
-  row.pm25,
-  row.co
-])
+        fechaColombia(row.created_at),
+        row.temperature,
+        row.humidity,
+        row.pm25,
+        row.co
+      ])
 
       newRow.eachCell(cell => {
         cell.border = {
@@ -168,7 +204,6 @@ worksheet.mergeCells('A2:E2')
         cell.alignment = { horizontal: 'center' }
       })
 
-      // Color dinámico PM2.5
       const pmCell = newRow.getCell(4)
 
       if (row.pm25 <= 12) {
@@ -189,14 +224,13 @@ worksheet.mergeCells('A2:E2')
 
     const total = data.length || 1
 
-    // ===== FILA PROMEDIOS =====
     const avgRow = worksheet.addRow([
-  'PROMEDIO',
-  (sumTemp / total).toFixed(2),
-  (sumHum / total).toFixed(2),
-  (sumPM25 / total).toFixed(2),
-  (sumCO / total).toFixed(2)
-])
+      'PROMEDIO',
+      (sumTemp / total).toFixed(2),
+      (sumHum / total).toFixed(2),
+      (sumPM25 / total).toFixed(2),
+      (sumCO / total).toFixed(2)
+    ])
 
     avgRow.eachCell(cell => {
       cell.font = { bold: true }
