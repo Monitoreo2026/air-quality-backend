@@ -156,7 +156,6 @@ footer{ text-align:center; color:var(--muted); font-size:14px; padding-bottom:40
       <span class="range moderate">1501 – 3000 Moderada</span>
       <span class="range bad">3001+ Crítica</span>
     </div>
-
   </div>
 </div>
 
@@ -199,187 +198,198 @@ footer{ text-align:center; color:var(--muted); font-size:14px; padding-bottom:40
 </div>
 
 <script>
-const API_URL="https://air-quality-backend-66j2.onrender.com";
+const API_URL = "https://air-quality-backend-66j2.onrender.com";
 
-function toggleTheme(){ document.body.classList.toggle("light"); }
+function toggleTheme() {
+  document.body.classList.toggle("light");
+}
 
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){entry.target.classList.add("show")}
-  })
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("show");
+    }
+  });
 });
-document.querySelectorAll(".fade").forEach(el=>observer.observe(el));
+document.querySelectorAll(".fade").forEach(el => observer.observe(el));
 
-function updateClock(){ document.getElementById("clock").innerText=new Date().toLocaleString(); }
-setInterval(updateClock,1000); updateClock();
+function updateClock() {
+  document.getElementById("clock").innerText = new Date().toLocaleString();
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-function getStatus(pm){
-  if(pm<=12) return ["BUENA","#22c55e","La calidad del aire es óptima."];
-  if(pm<=35) return ["MODERADA","#eab308","Puede afectar población sensible."];
-  return ["CRÍTICA","#ef4444","Riesgo para la salud general."];
+function getStatus(pm) {
+  if (pm <= 12) return ["BUENA", "#22c55e", "La calidad del aire es óptima."];
+  if (pm <= 35) return ["MODERADA", "#eab308", "Puede afectar población sensible."];
+  return ["CRÍTICA", "#ef4444", "Riesgo para la salud general."];
 }
 
-function getCOStatus(co){
-  if(co<=1500) return ["BUENA","#22c55e"];
-  if(co<=3001) return ["MODERADA","#eab308"];
-  return ["CRÍTICA","#ef4444"];
+function getCOStatus(co) {
+  if (co <= 1500) return ["BUENA", "#22c55e"];
+  if (co <= 3000) return ["MODERADA", "#eab308"];
+  return ["CRÍTICA", "#ef4444"];
 }
 
-function animateValue(id,start,end,duration){
-  let startTime=null;
-  function step(timestamp){
-    if(!startTime) startTime=timestamp;
-    let progress=Math.min((timestamp-startTime)/duration,1);
-    document.getElementById(id).innerText=Math.floor(progress*(end-start)+start);
-    if(progress<1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
+async function loadData() {
+  try {
+    const res = await fetch(`${API_URL}/data`);
+    const result = await res.json();
 
-async function loadData(){
-  try{
-    const res=await fetch(`${API_URL}/data`);
-    const data=await res.json();
-    if(!data.length) return;
+    if (!result.ok || !result.data || !result.data.length) {
+      document.getElementById("dot").className = "dot disconnected";
+      document.getElementById("statusText").innerText = "Sin datos";
+      return;
+    }
 
-    document.getElementById("dot").className="dot connected";
-    document.getElementById("statusText").innerText="Conectado";
+    const data = result.data;
 
-    const latest=data[0];
-    const prev=data[1];
+    document.getElementById("dot").className = "dot connected";
+    document.getElementById("statusText").innerText = "Conectado";
 
-    const [label,color,info]=getStatus(latest.pm25);
+    const latest = data[0];
+    const prev = data[1];
 
-    document.getElementById("pmValue").innerText = latest.pm25;
-    document.getElementById("pmValue").style.color=color;
-    document.getElementById("pmLabel").innerText=label;
-    document.getElementById("pmInfo").innerText=info;
+    const pm25 = Number(latest.pm25);
+    const temperature = Number(latest.temperature);
+    const humidity = Number(latest.humidity);
+    const co = Number(latest.co);
 
-    document.getElementById("temp").innerText=latest.temperature+" °C";
-    document.getElementById("hum").innerText=latest.humidity+" %";
-    document.getElementById("co").innerText=latest.co+" ADC";
+    const [label, color, info] = getStatus(pm25);
 
-    const [coLabel,coColor]=getCOStatus(latest.co);
-    document.getElementById("co").style.color=coColor;
-    document.getElementById("coMarker").style.left=
-      Math.min((latest.co/4095)*100,100)+"%";
+    document.getElementById("pmValue").innerText = pm25;
+    document.getElementById("pmValue").style.color = color;
+    document.getElementById("pmLabel").innerText = label;
+    document.getElementById("pmInfo").innerText = info;
 
-    document.getElementById("marker").style.left=
-      Math.min((latest.pm25/60)*100,100)+"%";
+    document.getElementById("temp").innerText = temperature + " °C";
+    document.getElementById("hum").innerText = humidity + " %";
+    document.getElementById("co").innerText = co + " ADC";
 
-    document.getElementById("estadoBox").innerText=
-      `Concentración actual de ${latest.pm25} µg/m³ clasificada como ${label}.`;
+    const [, coColor] = getCOStatus(co);
+    document.getElementById("co").style.color = coColor;
 
-    document.getElementById("saludBox").innerText=
-      label==="BUENA"?"No representa riesgo.":
-      label==="MODERADA"?"Personas sensibles deben limitar exposición.":
-      "Se recomienda evitar actividades al aire libre.";
+    document.getElementById("coMarker").style.left =
+      Math.min((co / 4095) * 100, 100) + "%";
 
-    document.getElementById("tendenciaBox").innerText=
-      prev && latest.pm25>prev.pm25?
-      "Tendencia ascendente detectada.":
-      "Tendencia estable o descendente.";
+    document.getElementById("marker").style.left =
+      Math.min((pm25 / 60) * 100, 100) + "%";
 
-    document.getElementById("recomendacionBox").innerText=
-      label==="CRÍTICA"?
-      "Implementar medidas preventivas inmediatas.":
-      "Continuar monitoreo constante.";
+    document.getElementById("estadoBox").innerText =
+      `Concentración actual de ${pm25} µg/m³ clasificada como ${label}.`;
 
-    const last20 = data.slice(0,20).reverse();
+    document.getElementById("saludBox").innerText =
+      label === "BUENA"
+        ? "No representa riesgo."
+        : label === "MODERADA"
+        ? "Personas sensibles deben limitar exposición."
+        : "Se recomienda evitar actividades al aire libre.";
 
-const labels = last20.map((d, index) => index + 1);
+    document.getElementById("tendenciaBox").innerText =
+      prev && pm25 > Number(prev.pm25)
+        ? "Tendencia ascendente detectada."
+        : "Tendencia estable o descendente.";
 
-// PM2.5
-chartPM.data.labels = labels;
-chartPM.data.datasets[0].data = last20.map(d =>
-  d.pm25 ? Number(d.pm25) : null
-);
-chartPM.update();
+    document.getElementById("recomendacionBox").innerText =
+      label === "CRÍTICA"
+        ? "Implementar medidas preventivas inmediatas."
+        : "Continuar monitoreo constante.";
 
-// CO
-chartCO.data.labels = labels;
-chartCO.data.datasets[0].data = last20.map(d =>
-  d.co ? Number(d.co) : null
-);
-chartCO.update();
+    const last20 = data.slice(0, 20).reverse();
+    const labels = last20.map((d, index) => index + 1);
 
-  }catch(err){
-    console.error("Error cargando datos:",err);
+    chartPM.data.labels = labels;
+    chartPM.data.datasets[0].data = last20.map(d =>
+      d.pm25 != null ? Number(d.pm25) : null
+    );
+    chartPM.update();
+
+    chartCO.data.labels = labels;
+    chartCO.data.datasets[0].data = last20.map(d =>
+      d.co != null ? Number(d.co) : null
+    );
+    chartCO.update();
+
+  } catch (err) {
+    console.error("Error cargando datos:", err);
+    document.getElementById("dot").className = "dot disconnected";
+    document.getElementById("statusText").innerText = "Sin conexión";
   }
 }
 
 const ctxPM = document.getElementById("chartPM").getContext("2d");
 const ctxCO = document.getElementById("chartCO").getContext("2d");
 
-
-const chartPM = new Chart(ctxPM,{
-  type:"line",
-  data:{
-    labels:[],
-    datasets:[{
-      label:"PM2.5",
-      data:[],
-      borderColor:"#3b82f6",
-      backgroundColor:"rgba(59,130,246,0.15)",
-      fill:true,
-      tension:.4,
-      pointRadius:3
+const chartPM = new Chart(ctxPM, {
+  type: "line",
+  data: {
+    labels: [],
+    datasets: [{
+      label: "PM2.5",
+      data: [],
+      borderColor: "#3b82f6",
+      backgroundColor: "rgba(59,130,246,0.15)",
+      fill: true,
+      tension: .4,
+      pointRadius: 3
     }]
   },
-  options:{
-  responsive:true,
-  maintainAspectRatio:false,
-  scales:{
-    y:{
-      min:0,
-      max:60,
-      ticks:{
-        stepSize:10
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        min: 0,
+        max: 60,
+        ticks: {
+          stepSize: 10
+        }
       }
     }
   }
-}
 });
-const chartCO = new Chart(ctxCO,{
-  type:"line",
-  data:{
-    labels:[],
-    datasets:[{
-      label:"CO (ADC)",
-      data:[],
-      borderColor:"#ef4444",
-      backgroundColor:"rgba(239,68,68,0.15)",
-      fill:true,
-      tension:.4,
-      pointRadius:3
+
+const chartCO = new Chart(ctxCO, {
+  type: "line",
+  data: {
+    labels: [],
+    datasets: [{
+      label: "CO (ADC)",
+      data: [],
+      borderColor: "#ef4444",
+      backgroundColor: "rgba(239,68,68,0.15)",
+      fill: true,
+      tension: .4,
+      pointRadius: 3
     }]
   },
-  options:{
-  responsive:true,
-  maintainAspectRatio:false,
-  scales:{
-    y:{
-      min:0,
-      max:4000,
-      ticks:{
-        stepSize:1000,
-        precision:0
-      }
-    },
-    x:{
-      ticks:{
-        maxTicksLimit:6
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        min: 0,
+        max: 4000,
+        ticks: {
+          stepSize: 1000,
+          precision: 0
+        }
+      },
+      x: {
+        ticks: {
+          maxTicksLimit: 6
+        }
       }
     }
   }
-}
 });
- 
 
-function downloadExcel(){ window.open(`${API_URL}/download`); }
+function downloadExcel() {
+  window.open(`${API_URL}/download`);
+}
 
 loadData();
-setInterval(loadData,5000);
+setInterval(loadData, 5000);
 </script>
 </body>
 </html>
